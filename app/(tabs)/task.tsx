@@ -28,16 +28,18 @@ const Task = () => {
   
   const tasks = activeTab === 'Active' ? allTasks : completedTasks
 
-  const handleTaskAction = (taskId:any, action:any) => {
+  const handleTaskAction = (taskId: number, action: string) => {
     console.log(`Task ${taskId} - Action: ${action}`)
+    // Add your task action logic here
+    // Make sure you're not calling any navigation methods here unless properly set up
   }
 
-  const TaskItem = ({ task }: any) => (
-    <View className="flex-row items-center justify-between py-4 mb-5 bg-neutral-950 rounded-xl">
+  const TaskItem = ({ task }: { task: any }) => (
+    <View className="flex-row items-center justify-between py-4 mb-5 bg-neutral-950 rounded-xl border-b border-neutral-900 ">
       {/* Task Icon and Info */}
       <View className="flex-row items-center flex-1">
         <View className="w-10 h-10 bg-black rounded-lg mr-3 justify-center items-center">
-          <MaterialIcons name='group' size={20} color={'white'} />
+          <MaterialIcons name={task.icon as any} size={20} color={'white'} />
         </View>
         
         <View className="flex-1">
@@ -56,16 +58,22 @@ const Task = () => {
         className={`px-6 py-2 rounded-full ${
           task.status === 'join' 
             ? 'bg-blue-500' 
-            : 'bg-transparent border border-blue-500'
+            : task.status === 'claim'
+            ? 'bg-transparent border border-blue-500'
+            : 'bg-gray-600'
         }`}
       >
         <Text 
           className={`text-sm font-medium ${
-            task.status === 'join' ? 'text-white' : 'text-blue-500'
+            task.status === 'join' 
+              ? 'text-white' 
+              : task.status === 'claim'
+              ? 'text-blue-500'
+              : 'text-gray-300'
           }`}
           style={{fontFamily: 'HankenGrotesk_500Medium'}}
         >
-          {task.status === 'join' ? 'Join' : 'Claim'}
+          {task.status === 'join' ? 'Join' : task.status === 'claim' ? 'Claim' : 'Completed'}
         </Text>
       </TouchableOpacity>
     </View>
@@ -84,7 +92,6 @@ const Task = () => {
             Get Rewarded for{'\n'}Completing a task
           </Text>
         </View>
-
 
         {/* Tab Navigation */}
         <View className="flex-row mb-4 bg-neutral-900 rounded-2xl p-1.5 border border-neutral-800">

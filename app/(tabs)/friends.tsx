@@ -60,7 +60,7 @@ const Friends = () => {
   }
 
   const ReferralItem = ({ referral }:any) => (
-    <View className="flex-row items-center justify-between py-4 mb-3 bg-neutral-950  rounded-2xl">
+    <View className="flex-row items-center justify-between py-4 mb-5 border-b border-neutral-900  bg-neutral-950  rounded-2xl">
       <View className="flex-row items-center flex-1">
         <View className="w-12 h-12 bg-black rounded-xl mr-4 justify-center items-center">
           <MaterialIcons name='person' size={24} color={'#F59E0B'} />
@@ -79,7 +79,7 @@ const Friends = () => {
       {/* Reward and Status */}
       <View className="items-end">
         <Text className="text-white text-base font-bold mb-1" style={{fontFamily: 'HankenGrotesk_700Bold'}}>
-          +{referral.reward} Kubot
+          +{referral.reward} KU
         </Text>
         <Text className="text-green-500 text-xs font-medium" style={{fontFamily: 'HankenGrotesk_500Medium'}}>
           {referral.status}
@@ -127,7 +127,7 @@ const Friends = () => {
 
         {/* Referral List */}
         <View className="pb-6">
-          <Text className="text-white text-lg font-semibold mb-4" style={{fontFamily: 'HankenGrotesk_600SemiBold'}}>
+          <Text className="text-white text-lg font-semibold pb-4 border-b border-neutral-900 " style={{fontFamily: 'HankenGrotesk_600SemiBold'}}>
             Recent Referrals
           </Text>
           {referrals.map((referral) => (
