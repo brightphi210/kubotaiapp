@@ -23,7 +23,7 @@ export default function TabLayout() {
           display: 'flex',
           justifyContent: 'center',
           alignItems: 'center',
-          backgroundColor: 'black',
+          backgroundColor: 'white',
           borderTopWidth: 0,
           borderTopColor: 'transparent',
         },
@@ -56,23 +56,6 @@ export default function TabLayout() {
       />
 
       <Tabs.Screen
-        name="task"
-        options={{
-          title: 'Task',
-           tabBarIcon: ({ focused }) => (
-            <View style={{
-              backgroundColor: 'transparent',
-              justifyContent: 'center',
-              alignItems: 'center',
-            }}>
-              <MaterialIcons name='notes' size={22} color={ focused ? "#016FEC": "#5F5F5F"} />
-              <Text className={`text-xs ${focused ? "text-[#016FEC]": "text-[#5F5F5F]"}` } style={{fontFamily: 'HankenGrotesk_600SemiBold'}}>Task</Text>
-            </View>
-          ),
-        }}
-      />
-
-      <Tabs.Screen
         name="friends"
         options={{
           title: 'Friends',
@@ -90,17 +73,17 @@ export default function TabLayout() {
       />
 
       <Tabs.Screen
-        name="leaders"
+        name="explore"
         options={{
-          title: 'Leader',
+          title: 'Explore',
            tabBarIcon: ({ focused }) => (
             <View style={{
               backgroundColor: 'transparent',
               justifyContent: 'center',
               alignItems: 'center',
             }}>
-              <Ionicons name='trophy-outline' size={22} color={ focused ? "#016FEC": "#5F5F5F"} />
-              <Text className={`text-xs ${focused ? "text-[#016FEC]": "text-[#5F5F5F]"}` } style={{fontFamily: 'HankenGrotesk_600SemiBold'}}>Leaders</Text>
+              <MaterialIcons name='explore' size={35} color={ focused ? "#016FEC": "#5F5F5F"} />
+              <Text className={`text-xs ${focused ? "text-[#016FEC]": "text-[#5F5F5F]"}` } style={{fontFamily: 'HankenGrotesk_600SemiBold'}}>Market</Text>
             </View>
           ),
         }}
@@ -118,6 +101,24 @@ export default function TabLayout() {
             }}>
               <Ionicons name='wallet-outline' size={22} color={ focused ? "#016FEC": "#5F5F5F"} />
               <Text className={`text-xs ${focused ? "text-[#016FEC]": "text-[#5F5F5F]"}` } style={{fontFamily: 'HankenGrotesk_600SemiBold'}}>Wallet</Text>
+            </View>
+          ),
+        }}
+      />
+
+
+      <Tabs.Screen
+        name="profile"
+        options={{
+          title: 'Profile',
+           tabBarIcon: ({ focused }) => (
+            <View style={{
+              backgroundColor: 'transparent',
+              justifyContent: 'center',
+              alignItems: 'center',
+            }}>
+              <MaterialIcons name='person-outline' size={22} color={ focused ? "#016FEC": "#5F5F5F"} />
+              <Text className={`text-xs ${focused ? "text-[#016FEC]": "text-[#5F5F5F]"}` } style={{fontFamily: 'HankenGrotesk_600SemiBold'}}>Profile</Text>
             </View>
           ),
         }}

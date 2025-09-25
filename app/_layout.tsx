@@ -18,10 +18,21 @@ import { ToastProvider } from 'react-native-toast-notifications';
 import '../global.css';
 
 
+import {
+  QueryClient,
+  QueryClientProvider
+} from "@tanstack/react-query";
+
 import { useColorScheme } from '@/hooks/useColorScheme';
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 
 export default function RootLayout() {
+
+  const queryClient = new QueryClient({
+    defaultOptions: { queries: { retry: 2 } },
+  });
+
+
   const colorScheme = useColorScheme();
   const [loaded] = useFonts({
     SpaceMono: require('../assets/fonts/SpaceMono-Regular.ttf'),
@@ -71,16 +82,18 @@ export default function RootLayout() {
             <MaterialIcons name="warning" size={22} color="#fff" />
           }
         >
+        <QueryClientProvider client={queryClient}>
           <KeyboardProvider>
             <GestureHandlerRootView>
               <Stack>
-                <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+                <Stack.Screen name="(access)" options={{ headerShown: false }} />
                 <Stack.Screen name="+not-found" />
               </Stack>
+              <StatusBar style="dark" />
             </GestureHandlerRootView>
           </KeyboardProvider>
+        </QueryClientProvider>
       </ToastProvider>
-      <StatusBar style="auto" />
     </ThemeProvider>
   );
 }
