@@ -2,7 +2,8 @@
 
 import type React from "react"
 import { useEffect, useRef } from "react"
-import { Animated, Dimensions, Modal, PanGestureHandler, State, TouchableWithoutFeedback, View } from "react-native"
+import { Animated, Dimensions, Modal, TouchableWithoutFeedback, View } from "react-native"
+import { PanGestureHandler, State } from "react-native-gesture-handler"
 
 interface CustomModalProps {
   visible: boolean

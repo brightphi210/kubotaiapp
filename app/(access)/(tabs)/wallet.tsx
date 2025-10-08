@@ -1,4 +1,5 @@
 import MaterialIcons from '@expo/vector-icons/MaterialIcons'
+import { StatusBar } from 'expo-status-bar'
 import React, { useState } from 'react'
 import {
   Alert,
@@ -63,7 +64,7 @@ const Wallet = () => {
   // No Wallet Connected State
   if (!isWalletConnected) {
     return (
-      <SafeAreaView className="flex-1" style={{ backgroundColor: '#0a0a0a' }}>
+      <SafeAreaView className="flex-1 bg-white">
         <View className="flex-1 justify-center items-center px-6">
           {/* Header */}
           
@@ -80,10 +81,10 @@ const Wallet = () => {
           </View>
 
           <View className="mb-6">
-            <Text className="text-2xl font-bold text-white text-center mb-2" style={{fontFamily: 'HankenGrotesk_700Bold'}}>
+            <Text className="text-2xl font-bold text-gray-900 text-center mb-2" style={{fontFamily: 'HankenGrotesk_700Bold'}}>
               Connect Wallet
             </Text>
-            <Text className="text-neutral-400 text-center text-lg leading-7" style={{fontFamily: 'HankenGrotesk_400Regular'}}>
+            <Text className="text-gray-600 text-center text-lg leading-7" style={{fontFamily: 'HankenGrotesk_400Regular'}}>
               Connect your wallet to claim rewards
             </Text>
           </View>
@@ -104,31 +105,32 @@ const Wallet = () => {
 
   // Connected Wallet State
   return (
-    <SafeAreaView className="flex-1" style={{ backgroundColor: '#0a0a0a' }}>
+    <SafeAreaView className="flex-1 bg-white">
+      <StatusBar style='dark'/>
       <ScrollView className="flex-1 px-6" showsVerticalScrollIndicator={false}>
         
         {/* Header */}
         <View className="py-5 pt-12">
-          <Text className="text-2xl font-bold text-white text-center mb-4" style={{fontFamily: 'HankenGrotesk_700Bold'}}>
+          <Text className="text-2xl font-bold text-gray-900 text-center mb-4" style={{fontFamily: 'HankenGrotesk_700Bold'}}>
             Wallet
           </Text>
-          <Text className="text-neutral-400 text-center text-lg leading-7" style={{fontFamily: 'HankenGrotesk_400Regular'}}>
+          <Text className="text-gray-600 text-center text-lg leading-7" style={{fontFamily: 'HankenGrotesk_400Regular'}}>
             Connect your wallet to{'\n'}claim rewards
           </Text>
         </View>
 
         {/* User Profile Card */}
-        <View className="bg-neutral-900 border border-neutral-800 rounded-2xl px-6 py-6 mb-6">
+        <View className="bg-gray-50 border border-gray-200 rounded-2xl px-6 py-6 mb-6">
           <View className="flex-row items-center mb-4">
             <View className="w-12 h-12 bg-orange-500 rounded-xl mr-4 justify-center items-center">
               <Text className="text-white text-lg">{userData.avatar}</Text>
             </View>
             
             <View className="flex-1">
-              <Text className="text-white text-base font-semibold mb-1" style={{fontFamily: 'HankenGrotesk_600SemiBold'}}>
+              <Text className="text-gray-900 text-base font-semibold mb-1" style={{fontFamily: 'HankenGrotesk_600SemiBold'}}>
                 {userData.name}
               </Text>
-              <Text className="text-neutral-400 text-sm" style={{fontFamily: 'HankenGrotesk_400Regular'}}>
+              <Text className="text-gray-600 text-sm" style={{fontFamily: 'HankenGrotesk_400Regular'}}>
                 {userData.handle}
               </Text>
             </View>
@@ -139,12 +141,12 @@ const Wallet = () => {
           </View>
 
           {/* Wallet Address */}
-          <View className="flex-row items-center justify-between bg-neutral-950 rounded-xl px-4 py-3">
+          <View className="flex-row items-center justify-between bg-white border border-gray-200 rounded-xl px-4 py-3">
             <View className="flex-row items-center flex-1">
               <View className="w-6 h-6 bg-blue-500 rounded-full mr-3 justify-center items-center">
                 <Text className="text-white text-xs font-bold">T</Text>
               </View>
-              <Text className="text-white text-sm" style={{fontFamily: 'HankenGrotesk_400Regular'}}>
+              <Text className="text-gray-900 text-sm" style={{fontFamily: 'HankenGrotesk_400Regular'}}>
                 {userData.address}
               </Text>
             </View>
@@ -186,11 +188,11 @@ const Wallet = () => {
             style={{
               transform: [{ translateY: slideAnim }],
             }}
-            className="bg-neutral-900 rounded-t-3xl"
+            className="bg-white rounded-t-3xl border-t border-gray-200"
           >
             {/* Modal Header */}
-            <View className="flex-row items-center justify-between px-6 py-4 border-b border-neutral-800">
-              <Text className="text-white text-lg font-semibold" style={{fontFamily: 'HankenGrotesk_600SemiBold'}}>
+            <View className="flex-row items-center justify-between px-6 py-4 border-b border-gray-200">
+              <Text className="text-gray-900 text-lg font-semibold" style={{fontFamily: 'HankenGrotesk_600SemiBold'}}>
                 Withdraw Tokens
               </Text>
               <TouchableOpacity onPress={closeWithdrawModal}>
@@ -207,10 +209,10 @@ const Wallet = () => {
                 </View>
                 
                 <View className="flex-1">
-                  <Text className="text-white text-base font-semibold mb-1" style={{fontFamily: 'HankenGrotesk_600SemiBold'}}>
+                  <Text className="text-gray-900 text-base font-semibold mb-1" style={{fontFamily: 'HankenGrotesk_600SemiBold'}}>
                     {userData.name}
                   </Text>
-                  <Text className="text-neutral-400 text-sm" style={{fontFamily: 'HankenGrotesk_400Regular'}}>
+                  <Text className="text-gray-600 text-sm" style={{fontFamily: 'HankenGrotesk_400Regular'}}>
                     {userData.handle}
                   </Text>
                 </View>
@@ -221,12 +223,12 @@ const Wallet = () => {
               </View>
 
               {/* Wallet Address */}
-              <View className="flex-row items-center justify-between bg-neutral-950 rounded-xl px-4 py-3 mb-6">
+              <View className="flex-row items-center justify-between bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 mb-6">
                 <View className="flex-row items-center flex-1">
                   <View className="w-6 h-6 bg-blue-500 rounded-full mr-3 justify-center items-center">
                     <Text className="text-white text-xs font-bold">T</Text>
                   </View>
-                  <Text className="text-white text-sm" style={{fontFamily: 'HankenGrotesk_400Regular'}}>
+                  <Text className="text-gray-900 text-sm" style={{fontFamily: 'HankenGrotesk_400Regular'}}>
                     {userData.address}
                   </Text>
                 </View>
@@ -238,14 +240,14 @@ const Wallet = () => {
 
               {/* Total Balance */}
               <View className="mb-8">
-                <Text className="text-neutral-400 text-sm mb-2" style={{fontFamily: 'HankenGrotesk_400Regular'}}>
+                <Text className="text-gray-600 text-sm mb-2" style={{fontFamily: 'HankenGrotesk_400Regular'}}>
                   Total Kubot
                 </Text>
                 <View className="flex-row items-center">
                   <View className="w-6 h-6 bg-blue-500 rounded-full mr-2 justify-center items-center">
                     <Text className="text-white text-xs font-bold">K</Text>
                   </View>
-                  <Text className="text-white text-2xl font-bold" style={{fontFamily: 'HankenGrotesk_700Bold'}}>
+                  <Text className="text-gray-900 text-2xl font-bold" style={{fontFamily: 'HankenGrotesk_700Bold'}}>
                     {userData.balance.toLocaleString()}
                   </Text>
                 </View>

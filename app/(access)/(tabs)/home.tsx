@@ -491,13 +491,13 @@ const Home = () => {
           
           {/* Header Icons */}
           <View className="flex-row items-center gap-2">
-            <TouchableOpacity className="p-2 bg-black/10 rounded-full ">
+            <TouchableOpacity className="p-2 bg-black/10 rounded-full" onPress={()=>router.push('/(access)/(stacks)/notification')}>
               <MaterialIcons name='notifications-none' size={24} color={'white'}/>
             </TouchableOpacity>
-            <TouchableOpacity className="p-2 bg-black/10 rounded-full " onPress={()=>router.push('/(stacks)/leaders')}>
+            <TouchableOpacity className="p-2 bg-black/10 rounded-full" onPress={()=>router.push('/(access)/(stacks)/leaders')}>
               <MaterialIcons name='emoji-events' size={24} color={'white'}/>
             </TouchableOpacity>
-            <TouchableOpacity className="p-2 bg-black/10 rounded-full ">
+            <TouchableOpacity className="p-2 bg-black/10 rounded-full">
               <MaterialIcons name='task' size={24} color={'white'}/>
             </TouchableOpacity>
             <TouchableOpacity className="p-2 bg-black/10 rounded-full ">
@@ -520,7 +520,7 @@ const Home = () => {
         showsVerticalScrollIndicator={false}
       >
         {/* Main Mining Interface */}
-        <View className="justify-center items-center py-8 mt-4">
+        <View className="justify-center items-center py-8 mt-4" >
           <CircularProgress progress={circleProgress} />
           
           {/* Timer and Boost Section - Moved under circle */}

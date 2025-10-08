@@ -13,6 +13,14 @@ export const SolidMainButton = ({text, onPress, ...props}: ButtonProps)=>{
     )
 }
 
+export const SolidLightButton = ({text, onPress, ...props}: ButtonProps)=>{
+    return (
+        <TouchableOpacity {...props} onPress={onPress} className="flex items-center gap-4 bg-[#c4dffd] p-4 py-5 w-full rounded-lg">
+            <Text className="text-[#016FEC] text-[13px]" style={{fontFamily: 'HankenGrotesk_700Bold'}}>{text}</Text>
+        </TouchableOpacity>
+    )
+}
+
 
 export const SolidMainButtonInactive = ({text, onPress, ...props}: ButtonProps)=>{
     return (

@@ -1,11 +1,11 @@
 import {
-  HankenGrotesk_100Thin,
-  HankenGrotesk_300Light,
-  HankenGrotesk_400Regular,
-  HankenGrotesk_500Medium,
-  HankenGrotesk_600SemiBold,
-  HankenGrotesk_700Bold,
-  HankenGrotesk_900Black
+    HankenGrotesk_100Thin,
+    HankenGrotesk_300Light,
+    HankenGrotesk_400Regular,
+    HankenGrotesk_500Medium,
+    HankenGrotesk_600SemiBold,
+    HankenGrotesk_700Bold,
+    HankenGrotesk_900Black
 } from "@expo-google-fonts/hanken-grotesk";
 import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native';
 import { useFonts } from 'expo-font';
@@ -19,8 +19,8 @@ import '../global.css';
 
 
 import {
-  QueryClient,
-  QueryClientProvider
+    QueryClient,
+    QueryClientProvider
 } from "@tanstack/react-query";
 
 import { useColorScheme } from '@/hooks/useColorScheme';
@@ -86,6 +86,7 @@ export default function RootLayout() {
           <KeyboardProvider>
             <GestureHandlerRootView>
               <Stack>
+                <Stack.Screen name="(noaccess)" options={{ headerShown: false }} />
                 <Stack.Screen name="(access)" options={{ headerShown: false }} />
                 <Stack.Screen name="+not-found" />
               </Stack>

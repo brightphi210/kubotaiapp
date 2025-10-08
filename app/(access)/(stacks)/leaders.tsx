@@ -1,5 +1,5 @@
+import Header from '@/components/Header'
 import MaterialIcons from '@expo/vector-icons/MaterialIcons'
-import { router } from 'expo-router'
 import { StatusBar } from 'expo-status-bar'
 import React, { useState } from 'react'
 import { Image, ScrollView, Text, TouchableOpacity, View } from 'react-native'
@@ -151,22 +151,7 @@ const Leaders = () => {
   return (
     <View className="flex-1" style={{ backgroundColor: '#F9FAFB' }}>
       <StatusBar style='light'/> 
-
-      {/* Header */}
-      <View className="px-4 py-3 pt-12 mb-4 bg-[#016FEC] border-b border-gray-200">
-        <View className="flex-row items-center">
-          <TouchableOpacity className="mr-4" onPress={()=>router.back()}>
-            <MaterialIcons name="arrow-back" size={24} color="white" />
-          </TouchableOpacity>
-          <Text 
-            className="text-2xl font-semibold text-white flex-1 text-center"
-            style={{ fontFamily: 'HankenGrotesk_600SemiBold' }}
-          >
-            Ranking
-          </Text>
-          <View className="w-6" />
-        </View>
-      </View>
+      <Header text='Ranking'/>
 
       {/* Tab Buttons */}
       <View className="flex-row mx-4 mt-4 mb-6">
