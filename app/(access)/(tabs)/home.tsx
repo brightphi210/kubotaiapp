@@ -1,3 +1,4 @@
+import { Ionicons } from '@expo/vector-icons'
 import MaterialIcons from '@expo/vector-icons/MaterialIcons'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import { router } from 'expo-router'
@@ -7,6 +8,8 @@ import {
   Animated,
   AppState,
   Dimensions,
+  Image,
+  Pressable,
   RefreshControl,
   ScrollView,
   Text,
@@ -42,39 +45,46 @@ const Home = () => {
   const blogPosts = [
     {
       id: 1,
-      title: "KYC Dev Diary | July–August",
+      title: "KYC Dev Diary",
+      image: 'https://images.unsplash.com/photo-1485965120184-e220f721d03e?w=800&h=600&fit=crop',
       date: "Aug 29, 2025",
       likes: "12.5k",
       category: "KYC",
-      bgColor: "#FFA726",
-      icon: "🐝"
+      content: 'Bee Network x ecosystem partners just ported Cut Fruit Ninja and 40+ other casual hits to the Game Center! Tired of mining? Slice-and-dice your way through watermelons or pop bubbles for a dopamine hit!',
+      note: 'PS: Wanna see your dream game here? Comment under official X post – your wish might go live! 😊'
     },
+
     {
       id: 2,
-      title: "Dev Diary – May & June Updates",
-      date: "Jun 30, 2025",
-      likes: "27.0k",
-      category: "Updates",
-      bgColor: "#1A1A1A",
-      icon: "🐝"
-    },
+      title: "Introducing Kutoken Staking",
+      image: 'https://images.unsplash.com/photo-1504384308090-c894fdcc538d?w=800&h=600&fit=crop',
+      date: "Sep 10, 2025",
+      likes: "8.3k",
+      category: "Staking",
+      content: 'Bee Network x ecosystem partners just ported Cut Fruit Ninja and 40+ other casual hits to the Game Center! Tired of mining? Slice-and-dice your way through watermelons or pop bubbles for a dopamine hit!',
+      note: 'PS: Wanna see your dream game here? Comment under official X post – your wish might go live! 😊'
+    }, 
+
     {
       id: 3,
-      title: "Celebrating 5th Bee's Day",
-      date: "May 20, 2025",
-      likes: "25.9k",
-      category: "Celebration",
-      bgColor: "#2196F3",
-      icon: "🎉"
-    },
+      title: "Kutoken Exchange Launch",
+      image: 'https://images.unsplash.com/photo-1498050108023-c5249f4df085?w=800&h=600&fit=crop',
+      date: "Oct 5, 2025",
+      likes: "15.1k",
+      category: "Exchange",
+      content: 'Bee Network x ecosystem partners just ported Cut Fruit Ninja and 40+ other casual hits to the Game Center! Tired of mining? Slice-and-dice your way through watermelons or pop bubbles for a dopamine hit!',
+      note: 'PS: Wanna see your dream game here? Comment under official X post – your wish might go live! 😊'
+    }, 
+
     {
       id: 4,
-      title: "Dev Diary April 2025",
-      date: "Apr 30, 2025",
-      likes: "35.8k",
-      category: "Updates",
-      bgColor: "#FFB74D",
-      icon: "👋"
+      title: "Security Best Practices",
+      image: 'https://images.unsplash.com/photo-1519389950473-47ba0277781c?w=800&h=600&fit=crop',
+      date: "Nov 12, 2025",
+      likes: "9.7k",
+      category: "Security",
+      content: 'Bee Network x ecosystem partners just ported Cut Fruit Ninja and 40+ other casual hits to the Game Center! Tired of mining? Slice-and-dice your way through watermelons or pop bubbles for a dopamine hit!',
+      note: 'PS: Wanna see your dream game here? Comment under official X post – your wish might go live! 😊'
     }
   ]
 
@@ -137,7 +147,6 @@ const Home = () => {
     
     setRefreshing(false)
   }
-
 
   // Save mining state to AsyncStorage
   const saveMiningState = async (miningState:any) => {
@@ -416,28 +425,31 @@ const Home = () => {
     }
   }
 
+  const handleRedirectItem = (post: any) => {
+    router.push({
+      pathname: "/(access)/(stacks)/blog/[id]",
+      params: { id: post.id, blogPostData: JSON.stringify(post) }
+    })
+  }
+
 
   const BlogPost = ({ post }: { post: any }) => (
-    <TouchableOpacity className="mb-4 bg-white rounded-xl overflow-hidden border border-gray-100">
-      <View className="flex-row">
-        {/* Blog Image/Icon */}
-        <View 
-          className="w-20 rounded-l-xl justify-center items-center"
-          style={{ backgroundColor: post.bgColor }}
-        >
-          <Text className="text-2xl">{post.icon}</Text>
-          <Text className="text-xs font-bold text-white mt-1" style={{fontFamily: 'HankenGrotesk_700Bold'}}>
-            BEE
-          </Text>
-          <Text className="text-xs font-bold text-white" style={{fontFamily: 'HankenGrotesk_700Bold'}}>
-            dex
-          </Text>
+    <TouchableOpacity onPress={()=>{handleRedirectItem(post)}} className="mb-4 bg-white rounded-xl  overflow-hidden border border-gray-100 w-[49%]">
+        <View className="relative">
+          <View 
+            className="w-full h-32 rounded-t-xl object-cover overflow-hidden justify-center items-center"
+          >
+            <Image source={{uri: post.image}} className='w-full h-full object-cover'/>
+          </View>
+          <Pressable className='absolute bottom-[-14px] right-1 bg-white/80 shadow rounded-full p-3 flex-row items-center' onPress={() => console.log('Share post', post.id)}>
+            <Ionicons name='share-outline' size={16} color={'black'}/>
+          </Pressable>
         </View>
         
         {/* Blog Content */}
-        <View className="flex-1 p-6">
+        <View className="flex-1 p-4 px-3">
           <View className="flex-row items-start justify-between">
-            <View className="flex-1 pr-3">
+            <View className="flex-1 pr-3"> 
               {/* Title */}
               <Text 
                 className="text-base font-semibold text-gray-900 mb-3 leading-5" 
@@ -449,21 +461,19 @@ const Home = () => {
               
               {/* Date and Likes */}
               <View className="flex-row items-center justify-between">
-                <Text className="text-sm text-gray-400" style={{fontFamily: 'HankenGrotesk_400Regular'}}>
+                <Text className="text-xs text-gray-400" style={{fontFamily: 'HankenGrotesk_400Regular'}}>
                   {post.date}
                 </Text>
                 <View className="flex-row items-center">
-                  <MaterialIcons name='favorite-border' size={16} color={'#6B7280'}/>
-                  <Text className="text-sm text-gray-500 ml-1" style={{fontFamily: 'HankenGrotesk_400Regular'}}>
+                  <MaterialIcons name='favorite-border' size={14} color={'#6B7280'}/>
+                  <Text className="text-xs text-gray-500 ml-1" style={{fontFamily: 'HankenGrotesk_400Regular'}}>
                     {post.likes}
                   </Text>
-                  <MaterialIcons name='share' size={16} color={'#6B7280'} style={{ marginLeft: 12 }}/>
                 </View>
               </View>
             </View>
           </View>
         </View>
-      </View>
     </TouchableOpacity>
   )
 
@@ -631,9 +641,11 @@ const Home = () => {
             News
           </Text>
           
-          {blogPosts.map((post) => (
-            <BlogPost key={post.id} post={post} />
-          ))}
+          <View className="flex-row flex-wrap justify-between">
+            {blogPosts.map((post) => (
+              <BlogPost key={post.id} post={post} />
+            ))}
+          </View>
         </View>
 
 

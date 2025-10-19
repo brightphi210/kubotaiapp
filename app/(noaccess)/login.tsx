@@ -1,5 +1,7 @@
 import { SolidMainButton } from "@/components/Btns"
+import LoadingOverlay from "@/components/LoadingOverlay"
 import { OnboardHeader } from "@/components/OnboardHeader"
+import { useLogin } from "@/hooks/mutation/useAuth"
 import { Ionicons } from "@expo/vector-icons"
 import { ErrorMessage } from "@hookform/error-message"
 import AsyncStorage from '@react-native-async-storage/async-storage'
@@ -25,7 +27,7 @@ const Login = () => {
   const toast = useToast();
 
   // ========= REACT HOOK FORM =========
-  const {
+ const {
     control,
     handleSubmit,
     formState: { errors },
@@ -37,32 +39,65 @@ const Login = () => {
     },
   });
 
-  const onSubmit = async (data: LoginFormData) => {
-    setIsLoading(true);
-    
+  const {mutate, isPending, } = useLogin();
+  // const loginMutation = useLogin();
+
+  const onSubmit = (data: LoginFormData) => {
     try {
-      // Check for constant login credentials
-      if (data.email === 'kunetwork@gmail.com' && data.password === 'ku6421') {
-        await AsyncStorage.setItem('ku_token', 'authenticated_user_token');
-        
-        console.log('Login successful');
-        reset();
-        toast.show('Login Successful', { type: "success" });
-        router.replace('/(access)/(tabs)/home');
-      } else {
-        toast.show('Invalid Credentials', { type: "danger" });
-      }
+      mutate(data, {
+
+        onSuccess: (response: any) => {
+          AsyncStorage.setItem('ku_token', response?.data?.token?.access);
+          reset()
+          toast.show('Login Successfull', { type: "success" });
+          router.replace('/(access)/(tabs)/home');
+          console.log('Login successful:', response?.data.token.access);
+        },
+        onError: (error: any) => {
+          console.log('Login failed:', error.response.detail);
+          
+          let errorMessage = 'Login failed. Please try again.';
+          let noAccountFound = error.response.data.error
+          
+          try {
+            if (error?.response?.data?.detail) {
+              errorMessage = error.response.data.detail;
+            } 
+
+            if (error?.response?.data?.message) {
+              errorMessage = error.response.data.message;
+            } 
+            
+            if (error?.message) {
+              errorMessage = error.message;
+            }
+            
+            if (noAccountFound) {
+              errorMessage = 'Invalid Credentials';
+            }
+
+            
+            if (typeof errorMessage !== 'string') {
+              errorMessage = 'Login failed. Please try again.';
+            }
+            
+            toast.show(errorMessage, { type: "danger" });
+          } catch (toastError) {
+            console.error('Toast error:', toastError);
+            toast.show('Login failed. Please try again.', { type: "danger" });
+          }
+        }
+      });
     } catch (error) {
       console.error('Login error:', error);
       toast.show('An unexpected error occurred.', { type: "danger" });
-    } finally {
-      setIsLoading(false);
     }
   };
 
   return (
     <SafeAreaView className='flex-1 flex w-full bg-white'>
       <StatusBar style='dark'/>
+      <LoadingOverlay visible={isPending} />
 
       <KeyboardAwareScrollView>
         <View className='px-7 mt-10'>
@@ -159,36 +194,6 @@ const Login = () => {
               />
             </Animated.View>
 
-            {/* <View className='pb-10 flex-row items-center justify-between'>
-              <Button
-                type="clear"
-                size="sm"
-                onPress={() => router.push("/")}
-                titleStyle={{
-                  color: "#3A3541AD",
-                  fontFamily: "HankenGrotesk_400Regular",
-                  fontSize: 14,
-                }}
-                disabled={isLoading}
-              >
-                Remember me
-              </Button>
-
-              <Button
-                type="clear"
-                size="sm"
-                onPress={() => router.push("/forget-password")}
-                titleStyle={{
-                  color: "#3A3541AD",
-                  fontFamily: "HankenGrotesk_400Regular",
-                  fontSize: 14,
-                }}
-                disabled={isLoading}
-              >
-                Forgot password?
-              </Button>
-            </View> */}
-
             <Animated.View className='flex-col gap-4' entering={FadeInDown.duration(600).delay(400).springify()}>
               <SolidMainButton 
                 text={'Login'} 
@@ -196,23 +201,16 @@ const Login = () => {
               />
             </Animated.View>
 
-            {/* <View className='pt-5 flex-row gap-4 justify-center'>
-              <Text className='text-[#3A3541] text-base' style={{fontFamily: 'HankenGrotesk_400Regular'}}>Don't have an account?</Text>
-
-              <Button
-                type="clear"
-                size="sm"
-                onPress={() => router.push("/user-role")}
-                titleStyle={{
-                  color: "#F75F15",
-                  fontFamily: "HankenGrotesk_600SemiBold",
-                  fontSize: 14,
-                }}
-                disabled={isLoading}
-              >
-                Create an account
-              </Button>
-            </View> */}
+            <View className='pt-5 flex-row gap-4 justify-center'>
+                 <Text className='text-[#3A3541] text-base' style={{fontFamily: 'HankenGrotesk_400Regular'}}>{"Don't have an account?"}</Text>
+   
+                 <Pressable
+                   className=""
+                   onPress={() => router.push("/(noaccess)/register")}
+                 >
+                   <Text className='text-[#016FEC] text-base' style={{fontFamily: 'HankenGrotesk_600SemiBold'}}>Register</Text>
+                 </Pressable>
+               </View>
           </View>
         </View>
       </KeyboardAwareScrollView>
