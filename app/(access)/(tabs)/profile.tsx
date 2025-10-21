@@ -1,24 +1,80 @@
+import { SolidLightButton, SolidMainButton } from '@/components/Btns'
+import { useGetProfile } from '@/hooks/queries/allQueries'
 import Ionicons from '@expo/vector-icons/Ionicons'
 import MaterialIcons from '@expo/vector-icons/MaterialIcons'
-import React from 'react'
-import { ScrollView, Text, TouchableOpacity, View } from 'react-native'
+import AsyncStorage from '@react-native-async-storage/async-storage'
+import { router } from 'expo-router'
+import { StatusBar } from 'expo-status-bar'
+import React, { useState } from 'react'
+import { ActivityIndicator, Image, ScrollView, Text, TouchableOpacity, View } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 
+const CustomModal = ({ visible, onClose, children }:any) => {
+if (!visible) return null;
+
+return (
+  <View className='absolute inset-0 flex-1 justify-center items-center bg-black/50 z-50'>
+    <TouchableOpacity 
+      className='absolute inset-0' 
+      onPress={onClose}
+      activeOpacity={1}
+    />
+    {children}
+  </View>
+);
+};
 const Profile = () => {
+
+  const [showDialog, setShowDialog] = useState(false);
+  
+  const handlePress = () => {
+    setShowDialog(true);
+  };
+
+  const closeDialog = () => {
+    setShowDialog(false);
+  };
+  const handleLogout = async () => {
+
+      await AsyncStorage.removeItem("ku_token");
+      await AsyncStorage.removeItem("ku_onboarding");
+      router.replace("/login");
+    };
+
+
+    const {isLoading, getProfile} = useGetProfile()
+    const profile = getProfile?.data.data
+
+
+  
+
   return (
     <SafeAreaView className="flex-1 bg-white">
+      <StatusBar style='dark'/>
       <ScrollView className="flex-1">
-        {/* Profile Section */}
-        <View className="items-center py-8 px-4">
-          <View className="w-24 h-24 bg-gray-200 rounded-full items-center justify-center mb-4">
-            <MaterialIcons name='person-4' size={45} color={'gray'}/>
+        {isLoading? 
+          <View className='justify-center m-auto mt-10'>
+            <ActivityIndicator size={'small'} color={'#016FEC'}/>
           </View>
-          <Text className="text-xl font-bold text-gray-900 mb-1">John Doe</Text>
-          <Text className="text-gray-500 text-base mb-4">john.doe@example.com</Text>
-          <TouchableOpacity className="bg-blue-500 px-6 py-2 rounded-lg">
-            <Text className="text-white font-medium">Edit Profile</Text>
-          </TouchableOpacity>
-        </View>
+          :
+          <View className="items-center py-8 px-4">
+            {
+              profile.image === null || profile.image === undefined ? 
+                <View className="w-24 h-24 bg-gray-200 rounded-full items-center justify-center mb-4">
+                  <MaterialIcons name='person-4' size={45} color={'gray'}/>
+                </View> :
+              
+                <View className="w-24 h-24 bg-gray-200 overflow-hidden object-cover rounded-full items-center justify-center mb-4">
+                  <Image source={{uri: profile.image}} className='w-full h-full object-cover'/>
+                </View>
+            }
+            <Text className="text-gray-500 text-base mb-4">{profile.username}</Text>
+            <TouchableOpacity onPress={()=>router.push('/(access)/(stacks)/profileEdit')} className="bg-blue-500 px-6 py-2 rounded-full flex-row items-center gap-2">
+              <Text className="text-white font-medium">Edit Profile</Text>
+              <MaterialIcons name='edit' color={'white'} size={15}/>
+            </TouchableOpacity>
+          </View>
+        }
 
         {/* Menu Options */}
         <View className="px-4 space-y-1">
@@ -46,7 +102,10 @@ const Profile = () => {
           </TouchableOpacity>
 
           {/* Invitation Code */}
-          <TouchableOpacity className="flex-row items-center justify-between py-4 px-4 bg-gray-50 rounded-xl mb-2">
+          <TouchableOpacity 
+            onPress={()=>router.push('/(access)/(stacks)/invitationCode')} 
+            className="flex-row items-center justify-between py-4 px-4 bg-gray-50 rounded-xl mb-2"
+          >
             <View className="flex-row items-center">
               <View className="w-10 h-10 bg-gray-200 rounded-lg items-center justify-center mr-3">
                 <MaterialIcons name='person-4' size={20} color={'gray'}/>
@@ -82,17 +141,7 @@ const Profile = () => {
             <Text className="text-gray-400 text-lg">›</Text>
           </TouchableOpacity>
 
-          {/* Security Setting */}
-          <TouchableOpacity className="flex-row items-center justify-between py-4 px-4 bg-gray-50 rounded-xl mb-2">
-            <View className="flex-row items-center">
-              <View className="w-10 h-10 bg-gray-200 rounded-lg items-center justify-center mr-3">
-                <MaterialIcons name='settings' size={20} color={'gray'}/>
-              </View>
-              <Text className="text-gray-800 font-medium text-base">Security Setting</Text>
-            </View>
-            <Text className="text-gray-400 text-lg">›</Text>
-          </TouchableOpacity>
-
+    
           {/* KYC Verification */}
           <TouchableOpacity className="flex-row items-center justify-between py-4 px-4 bg-gray-50 rounded-xl mb-2">
             <View className="flex-row items-center">
@@ -104,16 +153,16 @@ const Profile = () => {
             <Text className="text-gray-400 text-lg">›</Text>
           </TouchableOpacity>
 
-          {/* Notification Settings */}
           <TouchableOpacity className="flex-row items-center justify-between py-4 px-4 bg-gray-50 rounded-xl mb-2">
             <View className="flex-row items-center">
               <View className="w-10 h-10 bg-gray-200 rounded-lg items-center justify-center mr-3">
-                <MaterialIcons name='notifications' size={20} color={'gray'}/>
+                <MaterialIcons name='settings' size={20} color={'gray'}/>
               </View>
-              <Text className="text-gray-800 font-medium text-base">Notification Settings</Text>
+              <Text className="text-gray-800 font-medium text-base">About</Text>
             </View>
             <Text className="text-gray-400 text-lg">›</Text>
           </TouchableOpacity>
+
 
           {/* Feedback */}
           <TouchableOpacity className="flex-row items-center justify-between py-4 px-4 bg-gray-50 rounded-xl mb-2">
@@ -126,7 +175,7 @@ const Profile = () => {
             <Text className="text-gray-400 text-lg">›</Text>
           </TouchableOpacity>
 
-          <TouchableOpacity className="flex-row items-center justify-between py-4 px-4 bg-gray-50 rounded-xl mb-2">
+          <TouchableOpacity onPress={handlePress} className="flex-row items-center justify-between py-4 px-4 bg-gray-50 rounded-xl mb-2">
             <View className="flex-row items-center">
               <View className="w-10 h-10 bg-gray-200 rounded-lg items-center justify-center mr-3">
                 <Ionicons name='log-out' size={20} color={'gray'}/>
@@ -137,9 +186,32 @@ const Profile = () => {
           </TouchableOpacity>
         </View>
 
-        {/* Bottom Spacing */}
         <View className="h-14"></View>
       </ScrollView>
+
+      <CustomModal visible={showDialog} onClose={closeDialog}>
+          <View className='bg-white rounded-2xl p-8 mx-6 w-[90%]'>
+            <View className='items-center justify-center m-auto rounded-full p-5 bg-neutral-100 w-fit mb-5'>
+              <Ionicons name="log-out-outline" size={30} color={'gray'}/>
+            </View>
+            <Text className='text-xl text-center mb-2' style={{fontFamily: 'HankenGrotesk_600SemiBold'}}>
+              Logout from account
+            </Text>
+            <Text className='text-neutral-500 text-center mb-6 w-[90%] m-auto text-sm' style={{fontFamily: 'HankenGrotesk_500Medium'}}>
+              Are you sure you want to logout from your account? {'\n'} You can always login again later.
+            </Text>
+
+            <View className='flex-row items-center justify-between'>
+              <View className='w-[49%]'>
+                <SolidLightButton onPress={closeDialog} text='Cancle'/>
+              </View>
+
+              <View className='w-[49%]'>
+                <SolidMainButton onPress={handleLogout} text='Logout'/>
+              </View>
+            </View>
+          </View>
+        </CustomModal>
     </SafeAreaView>
   )
 }

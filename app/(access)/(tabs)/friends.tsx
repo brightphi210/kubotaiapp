@@ -1,9 +1,13 @@
 import Header from '@/components/Header'
+import LoadingOverlay from '@/components/LoadingOverlay'
+import { useGetFriends } from '@/hooks/queries/allQueries'
+import { Ionicons } from '@expo/vector-icons'
 import MaterialIcons from '@expo/vector-icons/MaterialIcons'
 import { StatusBar } from 'expo-status-bar'
 import React, { useState } from 'react'
 import {
   Alert,
+  Image,
   ScrollView,
   Share,
   Text,
@@ -11,56 +15,17 @@ import {
   View
 } from 'react-native'
 
+
 const Friends = () => {
   const [activeTab, setActiveTab] = useState('Team')
+
+  const {getFriendsData, isLoading} = useGetFriends()
+  const myFriendsData = getFriendsData?.data?.data || []
   
-  // Sample team member data
-  const teamMembers = [
-    { 
-      id: 1, 
-      name: 'KateAbah', 
-      username: '@172371028',
-      avatar: null,
-      status: 'Inactive',
-      canPing: true
-    },
-  ]
-
-  // Sample referral data for stats
-  const referrals = [
-    { 
-      id: 1, 
-      name: 'Bright', 
-      reward: 500, 
-      date: 'January 27 at 09:56',
-      status: 'Received'
-    },
-    { 
-      id: 2, 
-      name: 'Bright', 
-      reward: 500, 
-      date: 'January 27 at 09:56',
-      status: 'Received'
-    },
-    { 
-      id: 3, 
-      name: 'Bright', 
-      reward: 500, 
-      date: 'January 27 at 09:56',
-      status: 'Received'
-    },
-    { 
-      id: 4, 
-      name: 'Bright', 
-      reward: 500, 
-      date: 'January 27 at 09:56',
-      status: 'Received'
-    },
-  ]
-
-  const totalInvited = 0 // pioneers
-  const totalMembers = teamMembers.length
-  const activeMembers = teamMembers.filter(member => member.status === 'Active').length
+  console.log('Friends', myFriendsData[0]?.referred_user)
+  console.log('Friends Many', myFriendsData)
+  
+  const totalInvited = myFriendsData.length // pioneers
 
   const handleCopyInviteLink = async () => {
     const inviteLink = 'https://kubot.app/invite/iamkvisuals'
@@ -75,69 +40,39 @@ const Friends = () => {
     }
   }
 
-  const handlePing = (memberName : any) => {
-    Alert.alert('Ping', `Ping sent to ${memberName}`)
-  }
 
   const TeamMemberItem = ({ member }: any) => (
     <View className="flex-row items-center justify-between py-4 px-4 mb-3 bg-white rounded-xl">
       <View className="flex-row items-center flex-1">
-        <View className="w-12 h-12 bg-gray-200 rounded-full mr-4 justify-center items-center">
-          <Text className="text-gray-700 text-lg font-bold" style={{fontFamily: 'HankenGrotesk_700Bold'}}>
-            {member.name.charAt(0)}
-          </Text>
+        <View className="w-12 h-12 bg-gray-200 rounded-full object-cover overflow-hidden mr-4 justify-center items-center">
+          {member?.referred_user?.profile?.image ? (
+            <Image 
+              source={{uri: member.referred_user.profile.image}} 
+              className='w-full h-full object-cover'
+            />
+          ) : (
+            <Ionicons name="person" size={24} color="gray" />
+          )}
         </View>
         
         <View className="flex-1">
-          <Text className="text-gray-700 text-base font-semibold mb-1" style={{fontFamily: 'HankenGrotesk_600SemiBold'}}>
-            {member.name}
+          <Text className="text-[#016FEC] text-base mb-1" style={{fontFamily: 'HankenGrotesk_600SemiBold'}}>
+            {member?.referred_user?.fullName|| 'Chibuzor Philip'}
           </Text>
-          <Text className="text-neutral-400 text-sm mb-1" style={{fontFamily: 'HankenGrotesk_400Regular'}}>
-            {member.username}
-          </Text>
-          <Text className="text-neutral-500 text-xs" style={{fontFamily: 'HankenGrotesk_400Regular'}}>
-            {member.status}
+          <Text className="text-neutral-400 text-xs" style={{fontFamily: 'HankenGrotesk_400Regular'}}>
+            {member?.referred_user?.username.slice(0, 20) || 'N/A'}...
           </Text>
         </View>
-      </View>
-      
-      {member.canPing && (
-        <TouchableOpacity
-          onPress={() => handlePing(member.name)}
-          className="bg-yellow-500/20 border border-yellow-500/40 rounded-full px-4 py-2"
-        >
-          <Text className="text-yellow-500 text-xs font-medium" style={{fontFamily: 'HankenGrotesk_500Medium'}}>
-            Ping
-          </Text>
-        </TouchableOpacity>
-      )}
-    </View>
-  )
 
-  const ReferralItem = ({ referral }: any) => (
-    <View className="flex-row items-center justify-between py-4 mb-5 border-b border-neutral-900 bg-neutral-950 rounded-2xl px-4">
-      <View className="flex-row items-center flex-1">
-        <View className="w-12 h-12 bg-black rounded-xl mr-4 justify-center items-center">
-          <MaterialIcons name='person' size={24} color={'#F59E0B'} />
-        </View>
-        
-        <View className="flex-1">
-          <Text className="text-white text-base font-semibold mb-1" style={{fontFamily: 'HankenGrotesk_600SemiBold'}}>
-            {referral.name}
-          </Text>
-          <Text className="text-neutral-400 text-sm" style={{fontFamily: 'HankenGrotesk_400Regular'}}>
-            {referral.date}
+        <View className='self-end'>
+          <Text className='text-xs text-gray-500'>
+            {new Date(member?.created_at).toLocaleDateString('en-US', {
+              year: 'numeric',
+              month: 'short',
+              day: 'numeric'
+            })}
           </Text>
         </View>
-      </View>
-      
-      <View className="items-end">
-        <Text className="text-white text-base font-bold mb-1" style={{fontFamily: 'HankenGrotesk_700Bold'}}>
-          +{referral.reward} KU
-        </Text>
-        <Text className="text-green-500 text-xs font-medium" style={{fontFamily: 'HankenGrotesk_500Medium'}}>
-          {referral.status}
-        </Text>
       </View>
     </View>
   )
@@ -146,6 +81,7 @@ const Friends = () => {
     <View className="flex-1" style={{ backgroundColor: '#f5f5f5' }}>
       <StatusBar style='light'/>      
       <Header text='Friend' />
+      <LoadingOverlay visible={isLoading}/>
 
       <View className="flex-1 bg-gray-100 px-4">
         <View className="flex-row mx-6 mt-6 mb-6">
@@ -190,49 +126,37 @@ const Friends = () => {
                     Your team has
                   </Text>
                   <Text className="text-gray-400 text-sm mb-2" style={{fontFamily: 'HankenGrotesk_400Regular'}}>
-                    {totalMembers} member(s)
-                  </Text>
-                </View>
-
-                <View className="mb-2">
-                  <Text className="text-gray-800 text-base mb-2" style={{fontFamily: 'HankenGrotesk_400Regular'}}>
-                    Currently earning
-                  </Text>
-                  <Text className="text-gray-400 text-sm mb-2" style={{fontFamily: 'HankenGrotesk_400Regular'}}>
-                    {activeMembers} active member(s)
+                    {myFriendsData.length} member(s)
                   </Text>
                 </View>
               </View>
 
               {/* Team Members List */}
-              <View className="mb-6">
-                {teamMembers.length > 0 ? (
-                  teamMembers.map((member) => (
-                    <TeamMemberItem key={member.id} member={member} />
-                  ))
-                ) : (
-                  <View className="py-8">
-                    <Text className="text-center text-gray-500" style={{fontFamily: 'HankenGrotesk_400Regular'}}>
-                      No team members yet
-                    </Text>
-                  </View>
-                )}
-                
-                {teamMembers.length > 0 && (
-                  <View className="py-4">
-                    <Text className="text-center text-gray-500" style={{fontFamily: 'HankenGrotesk_400Regular'}}>
-                      No more
-                    </Text>
-                  </View>
-                )}
-              </View>
+              {!isLoading && (
+                <View className="mb-6">
+                  {myFriendsData.length > 0 ? (
+                    myFriendsData.map((member: any) => (
+                      <TeamMemberItem key={member.id} member={member} />
+                    ))
+                  ) : (
+                    <View className="py-8 pt-10">
+                      <View className='bg-gray-200 w-fit m-auto p-4 px-4.5 rounded-full'>
+                        <Ionicons name='people' size={30} color={'gray'}/>
+                      </View>
+                      <Text className="text-center text-gray-500 pt-4 text-sm" style={{fontFamily: 'HankenGrotesk_400Regular'}}>
+                        No team members yet
+                      </Text>
+                    </View>
+                  )}
+                </View>
+              )}
             </>
           )}
 
           {activeTab === 'Security Circle' && (
             <View className="flex-1 justify-center items-center py-20">
               <Text className="text-gray-500 text-center" style={{fontFamily: 'HankenGrotesk_400Regular'}}>
-                Security Circle content coming soon
+                Content coming soon
               </Text>
             </View>
           )}

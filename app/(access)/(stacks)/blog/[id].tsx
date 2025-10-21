@@ -5,38 +5,6 @@ import React from 'react';
 import { Image, ScrollView, Text, TouchableOpacity, View } from 'react-native';
 
 const Blog = () => {
-  const updates = [
-    {
-      id: 1,
-      icon: '🎮',
-      number: '1',
-      title: '40 Games Crash-Landed!',
-      content: 'Bee Network x ecosystem partners just ported Cut Fruit Ninja and 40+ other casual hits to the Game Center! Tired of mining? Slice-and-dice your way through watermelons or pop bubbles for a dopamine hit!',
-      note: 'PS: Wanna see your dream game here? Comment under official X post – your wish might go live! 😊'
-    },
-    {
-      id: 2,
-      icon: '💳',
-      number: '2',
-      title: 'Wallet 2.0: Baked to Perfection (coming soon, available on Version 1.28)',
-      content: 'DING! Bee Wallet 2.0 is 100% baked and ready to serve this May 🎉 Create/upgrade your decentralized wallet now. Remember: "Your keys, your honey, no compromises." 🐝✨',
-      footer: 'Bee Network Wallet 2.0 — Your Decentralized Future'
-    },
-    {
-      id: 3,
-      icon: '🎨',
-      number: '3',
-      title: 'Game Center Got a UI Glow-Up (Also Version 1.28 New Feature)',
-      content: 'New look, who dis? We redesigned the Game Center based on YOUR votes via DAO – smoother navigation and visuals, and bee-friendly controls. This update\'s your jam! 🐝'
-    },
-    {
-      id: 4,
-      icon: '📋',
-      number: '4',
-      title: 'About KYC',
-      content: 'Handling KYC for 45M+ Believers? It\'s literally a Mission: Impossible. So it took our much time to tailor the process. Anyway new KYC rollout is next month. 👍'
-    }
-  ];
 
   const {blogPostData} = useLocalSearchParams()
   const myPosts = JSON.parse(blogPostData as string);
@@ -71,9 +39,14 @@ const Blog = () => {
                 {myPosts.title}
             </Text>
 
-            <Text className="text-sm text-gray-400 mb-6" style={{fontFamily: 'HankenGrotesk_400Regular'}}>
-                {myPosts.category}
-            </Text>
+            <View className='flex-row items-center gap-2 mt-2 mb-6'>
+              <View className='bg-gray-200 p-2 rounded-full'>
+                <MaterialIcons name='person-4' size={13}/>
+              </View>
+              <Text className="text-base text-gray-500" style={{fontFamily: 'HankenGrotesk_400Regular'}}>
+                  {myPosts.author_name}
+              </Text>
+            </View>
 
             <View className="mb-6 pb-5 border-b border-gray-100">
                 <Text className="text-sm text-gray-700 leading-6 mb-2" style={{fontFamily: 'HankenGrotesk_400Regular'}}>
@@ -82,7 +55,7 @@ const Blog = () => {
 
                 {/* Optional Note */}
                 {myPosts.note && (
-                <Text className="text-sm text-gray-600 leading-6 mt-2" style={{fontFamily: 'HankenGrotesk_400Regular'}}>
+                <Text className="text-sm text-gray-600 border-t border-gray-100 leading-6 mt-2 pt-4" style={{fontFamily: 'HankenGrotesk_400Regular'}}>
                     {myPosts.note}
                 </Text>
                 )}
@@ -90,13 +63,17 @@ const Blog = () => {
 
             <View className='flex-row items-center justify-between'>
                 <Text className="text-sm text-gray-400 mb-6" style={{fontFamily: 'HankenGrotesk_400Regular'}}>
-                    {myPosts.date}
+                    {new Date(myPosts.created_at).toLocaleDateString('en-US', {
+                    year: 'numeric',
+                    month: 'short',
+                    day: 'numeric'
+                  })}
                 </Text>
 
                 <View className="flex-row items-center">
                   <MaterialIcons name='favorite-border' size={16} color={'#6B7280'}/>
                   <Text className="text-sm text-gray-500 ml-1" style={{fontFamily: 'HankenGrotesk_400Regular'}}>
-                    {myPosts.likes}
+                    {myPosts.likes_count}
                   </Text>
                 </View>
             </View>

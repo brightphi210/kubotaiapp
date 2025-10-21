@@ -1,5 +1,6 @@
-import { useMutation } from "@tanstack/react-query";
-import { post_requests } from "../helpers/axios_helper";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { post_requests, put_request_with_image } from "../helpers/axios_helper";
 
 export const useRegistration = () => {
   const registrationMutation = useMutation({
@@ -17,3 +18,32 @@ export const useLogin = () => {
 
   return loginMutation;
 };
+
+
+export const useProfileUpdate = () => {
+  const registrationMutation = useMutation({
+    mutationFn: (data: any) => post_requests("/users/profile", data),
+  });
+
+  return registrationMutation;
+}
+
+
+export const useUpdateUserProfile = () => {
+  const queryClient = useQueryClient()
+
+  const updateProfile = useMutation({
+    mutationFn: async (data: FormData) => {
+      const token = (await AsyncStorage.getItem("movebay_token")) || ""
+      return put_request_with_image(`/users/profile`, data, token)
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["user-profile"] })
+      queryClient.invalidateQueries({ queryKey: ["profile"] })
+    },
+  })
+
+  return updateProfile
+}
+
+// https://ku-network.onrender.com/users/profile/update

@@ -11,7 +11,7 @@ const InitialScreen = () => {
       <View>
         <Text className="text-white text-lg" style={{fontFamily: 'HankenGrotesk_600SemiBold'}}>KU Network</Text>
         <ActivityIndicator
-            size={30}
+            size={'large'}
             animating={true}
             color={'white'}
         />

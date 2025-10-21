@@ -1,3 +1,5 @@
+import LoadingOverlay from '@/components/LoadingOverlay'
+import { useGetNews, useGetProfile } from '@/hooks/queries/allQueries'
 import { Ionicons } from '@expo/vector-icons'
 import MaterialIcons from '@expo/vector-icons/MaterialIcons'
 import AsyncStorage from '@react-native-async-storage/async-storage'
@@ -5,9 +7,9 @@ import { router } from 'expo-router'
 import { StatusBar } from 'expo-status-bar'
 import React, { useEffect, useState } from 'react'
 import {
+  ActivityIndicator,
   Animated,
   AppState,
-  Dimensions,
   Image,
   Pressable,
   RefreshControl,
@@ -18,16 +20,11 @@ import {
 } from 'react-native'
 import Svg, { Circle } from 'react-native-svg'
 
-
-const { width: screenWidth, height: screenHeight } = Dimensions.get('window')
-
-
 const Home = () => {
   const [isMining, setIsMining] = useState(false)
   const [balance, setBalance] = useState(0)
   const [timeElapsed, setTimeElapsed] = useState(0)
   const [miningStartTime, setMiningStartTime] = useState<number | null>(null)
-  const [progress] = useState(new Animated.Value(0))
   const [circleProgress] = useState(new Animated.Value(0))
   const [tokensMinedThisSession, setTokensMinedThisSession] = useState(0)
   const [refreshing, setRefreshing] = useState(false)
@@ -36,58 +33,17 @@ const Home = () => {
 
   // Mining configuration
   const TOKENS_PER_12_HOURS = 5
-  const MINING_DURATION = 12 * 60 * 60 // 12 hours in seconds
-  const TOKENS_PER_SECOND = TOKENS_PER_12_HOURS / MINING_DURATION // ~0.0001157 tokens per second
-  const TOKENS_PER_HOUR = TOKENS_PER_SECOND * 3600 // ~0.4166 tokens per hour
+  const MINING_DURATION = 12 * 60 * 60
+  const TOKENS_PER_SECOND = TOKENS_PER_12_HOURS / MINING_DURATION
+  const TOKENS_PER_HOUR = TOKENS_PER_SECOND * 3600
 
 
-  // Blog data
-  const blogPosts = [
-    {
-      id: 1,
-      title: "KYC Dev Diary",
-      image: 'https://images.unsplash.com/photo-1485965120184-e220f721d03e?w=800&h=600&fit=crop',
-      date: "Aug 29, 2025",
-      likes: "12.5k",
-      category: "KYC",
-      content: 'Bee Network x ecosystem partners just ported Cut Fruit Ninja and 40+ other casual hits to the Game Center! Tired of mining? Slice-and-dice your way through watermelons or pop bubbles for a dopamine hit!',
-      note: 'PS: Wanna see your dream game here? Comment under official X post – your wish might go live! 😊'
-    },
-
-    {
-      id: 2,
-      title: "Introducing Kutoken Staking",
-      image: 'https://images.unsplash.com/photo-1504384308090-c894fdcc538d?w=800&h=600&fit=crop',
-      date: "Sep 10, 2025",
-      likes: "8.3k",
-      category: "Staking",
-      content: 'Bee Network x ecosystem partners just ported Cut Fruit Ninja and 40+ other casual hits to the Game Center! Tired of mining? Slice-and-dice your way through watermelons or pop bubbles for a dopamine hit!',
-      note: 'PS: Wanna see your dream game here? Comment under official X post – your wish might go live! 😊'
-    }, 
-
-    {
-      id: 3,
-      title: "Kutoken Exchange Launch",
-      image: 'https://images.unsplash.com/photo-1498050108023-c5249f4df085?w=800&h=600&fit=crop',
-      date: "Oct 5, 2025",
-      likes: "15.1k",
-      category: "Exchange",
-      content: 'Bee Network x ecosystem partners just ported Cut Fruit Ninja and 40+ other casual hits to the Game Center! Tired of mining? Slice-and-dice your way through watermelons or pop bubbles for a dopamine hit!',
-      note: 'PS: Wanna see your dream game here? Comment under official X post – your wish might go live! 😊'
-    }, 
-
-    {
-      id: 4,
-      title: "Security Best Practices",
-      image: 'https://images.unsplash.com/photo-1519389950473-47ba0277781c?w=800&h=600&fit=crop',
-      date: "Nov 12, 2025",
-      likes: "9.7k",
-      category: "Security",
-      content: 'Bee Network x ecosystem partners just ported Cut Fruit Ninja and 40+ other casual hits to the Game Center! Tired of mining? Slice-and-dice your way through watermelons or pop bubbles for a dopamine hit!',
-      note: 'PS: Wanna see your dream game here? Comment under official X post – your wish might go live! 😊'
-    }
-  ]
-
+  const {getNews, isLoading} = useGetNews()
+  const getNewsData = getNews?.data.data
+  const {getProfile, isLoading: profileLoading} = useGetProfile()
+  const profileData = getProfile?.data.data
+  console.log('News data', getNewsData)
+  console.log('Profile Data data', profileData)
 
   // Pulse animation for mining
   useEffect(() => {
@@ -157,7 +113,6 @@ const Home = () => {
     }
   }
 
-
   // Load mining state from AsyncStorage
   const loadMiningState = async () => {
     try {
@@ -170,7 +125,6 @@ const Home = () => {
     }
     return null
   }
-
 
   // Calculate mining progress based on elapsed time
   const calculateMiningProgress = (startTime: any, currentTime: any) => {
@@ -186,7 +140,6 @@ const Home = () => {
       isComplete: clampedElapsed >= MINING_DURATION
     }
   }
-
 
   // Initialize app state on mount
   useEffect(() => {
@@ -223,7 +176,6 @@ const Home = () => {
     
     initializeApp()
   }, [])
-
 
   // Handle app state changes (when app goes to background/foreground)
   useEffect(() => {
@@ -290,7 +242,6 @@ const Home = () => {
     }
   }, [isMining, miningStartTime, balance, tokensMinedThisSession])
 
-
   const formatTime = (seconds:any) => {
     const hours = Math.floor(seconds / 3600)
     const minutes = Math.floor((seconds % 3600) / 60)
@@ -305,16 +256,13 @@ const Home = () => {
     return 'Mining in progress..'
   }
 
-
   const getMiningRateDisplay = () => {
     return `+${TOKENS_PER_HOUR.toFixed(4)} KU/hr`
   }
 
-
   const handleBoost = () => {
     console.log('Boost activated!')
   }
-
 
   const CircularProgress = ({ progress, size = 280, strokeWidth = 12 }: any) => {
     const radius = (size - strokeWidth) / 2
@@ -385,7 +333,6 @@ const Home = () => {
     )
   }
 
-
   const handleMiningToggle = async () => {
     if (timeElapsed >= MINING_DURATION) {
       // Reset for new mining session
@@ -439,7 +386,7 @@ const Home = () => {
           <View 
             className="w-full h-32 rounded-t-xl object-cover overflow-hidden justify-center items-center"
           >
-            <Image source={{uri: post.image}} className='w-full h-full object-cover'/>
+            <Image source={{uri: post.image_url}} className='w-full h-full object-cover'/>
           </View>
           <Pressable className='absolute bottom-[-14px] right-1 bg-white/80 shadow rounded-full p-3 flex-row items-center' onPress={() => console.log('Share post', post.id)}>
             <Ionicons name='share-outline' size={16} color={'black'}/>
@@ -461,13 +408,18 @@ const Home = () => {
               
               {/* Date and Likes */}
               <View className="flex-row items-center justify-between">
-                <Text className="text-xs text-gray-400" style={{fontFamily: 'HankenGrotesk_400Regular'}}>
-                  {post.date}
+               <Text className="text-xs text-gray-400" style={{fontFamily: 'HankenGrotesk_400Regular'}}>
+                  {new Date(post.created_at).toLocaleDateString('en-US', {
+                    year: 'numeric',
+                    month: 'short',
+                    day: 'numeric'
+                  })}
                 </Text>
+
                 <View className="flex-row items-center">
                   <MaterialIcons name='favorite-border' size={14} color={'#6B7280'}/>
                   <Text className="text-xs text-gray-500 ml-1" style={{fontFamily: 'HankenGrotesk_400Regular'}}>
-                    {post.likes}
+                    {post.likes_count}
                   </Text>
                 </View>
               </View>
@@ -481,6 +433,7 @@ const Home = () => {
   return (
     <View className="flex-1 bg-[#F6F6F6]">
       <StatusBar style='light'/>
+      <LoadingOverlay visible={isLoading}/>
       
       {/* Fixed Header */}
       <View 
@@ -488,30 +441,46 @@ const Home = () => {
         style={{ backgroundColor: '#016FEC' }}
       >
         <View className="flex-row items-center justify-between">
-          <View className="flex-row items-center">
-            <View className="w-10 h-10 bg-white/20 rounded-full mr-3 justify-center items-center" style={{borderRadius: 50}}>
-              <MaterialIcons name='person-3' color={'white'} size={22}/>
-            </View>
+
+          {
+            profileLoading ? 
             <View>
+              <ActivityIndicator size={'small'} color={'white'}/>
+            </View>: 
+          
+          <Pressable onPress={()=>router.push('/(access)/(tabs)/profile')} className="flex-row items-center">
+            {
+              profileData.image === null || profileData.image === undefined ?
+              <View className="w-10 h-10 bg-white/20 overflow-hidden object-cover rounded-full mr-3 justify-center items-center" style={{borderRadius: 50}}>
+                <Image source={require('../../../assets/images/avatar2.png')} className='w-full h-full object-cover'/>
+              </View> :
+              <View className="w-10 h-10 bg-white/20 overflow-hidden object-cover rounded-full mr-3 justify-center items-center" style={{borderRadius: 50}}>
+                <Image source={{uri: profileData.image}} className='w-full h-full object-cover'/>
+              </View>
+            }
+            <View>
+              {profileData.username &&
               <Text className="text-lg font-semibold text-white" style={{fontFamily: 'HankenGrotesk_600SemiBold'}}>
-                Kutoken.com
+                @{profileData.username.toUpperCase().slice(0, 8)}...
               </Text>
+              }
             </View>
-          </View>
+          </Pressable>
+          }
           
           {/* Header Icons */}
           <View className="flex-row items-center gap-2">
-            <TouchableOpacity className="p-2 bg-black/10 rounded-full" onPress={()=>router.push('/(access)/(stacks)/notification')}>
-              <MaterialIcons name='notifications-none' size={24} color={'white'}/>
+            <TouchableOpacity className="p-2.5 bg-black/10 rounded-full" onPress={()=>router.push('/(access)/(stacks)/notification')}>
+              <MaterialIcons name='notifications-none' size={22} color={'white'}/>
             </TouchableOpacity>
-            <TouchableOpacity className="p-2 bg-black/10 rounded-full" onPress={()=>router.push('/(access)/(stacks)/leaders')}>
-              <MaterialIcons name='emoji-events' size={24} color={'white'}/>
+            <TouchableOpacity className="p-2.5 bg-black/10 rounded-full" onPress={()=>router.push('/(access)/(stacks)/leaders')}>
+              <MaterialIcons name='emoji-events' size={22} color={'white'}/>
             </TouchableOpacity>
-            <TouchableOpacity className="p-2 bg-black/10 rounded-full">
-              <MaterialIcons name='task' size={24} color={'white'}/>
+            <TouchableOpacity onPress={()=>router.push('/(access)/(stacks)/task')} className="p-2.5 bg-black/10 rounded-full">
+              <MaterialIcons name='task' size={22} color={'white'}/>
             </TouchableOpacity>
-            <TouchableOpacity className="p-2 bg-black/10 rounded-full ">
-              <MaterialIcons name='chat-bubble-outline' size={24} color={'white'}/>
+            <TouchableOpacity onPress={()=>router.push('/(access)/(stacks)/earnings')} className="p-2.5 bg-black/10 rounded-full ">
+              <MaterialIcons name='trending-up' size={22} color={'white'}/>
             </TouchableOpacity>
           </View>
         </View>
@@ -623,6 +592,7 @@ const Home = () => {
           {/* Check Earnings Button */}
           <View className="flex-1">
             <TouchableOpacity 
+              onPress={()=>router.push('/(access)/(stacks)/earnings')}
               className="flex-row gap-3 items-center px-6 py-4 rounded-xl justify-center"
               style={{ backgroundColor: '#DBEAFE' }}
             >
@@ -642,9 +612,25 @@ const Home = () => {
           </Text>
           
           <View className="flex-row flex-wrap justify-between">
-            {blogPosts.map((post) => (
-              <BlogPost key={post.id} post={post} />
-            ))}
+            {getNewsData === undefined || getNewsData.length === 0 ?
+              <View className='justify-center mt-10 m-auto'>
+                <MaterialIcons name='dataset' size={16} color={'gray'}/>
+                <Text className='text-sm text-center text-gray-500'>No data available</Text>
+              </View>: 
+              <>
+                {
+                  isLoading ? 
+                  <View className='justify-center m-auto mt-10'>
+                    <ActivityIndicator size={'small'} color={'#016FEC'}/>
+                  </View>: 
+                  <>
+                    {getNewsData.map((post: any) => (
+                      <BlogPost key={post.id} post={post} />
+                    ))}
+                  </>
+                }
+              </>
+            }
           </View>
         </View>
 

@@ -13,11 +13,11 @@ const OnBoardingPage = () => {
 
     const handleRedirectSignup = async () => {
       await AsyncStorage.setItem("ku_onboarding", "true");
-      router.replace("/login");
+      router.replace("/(noaccess)/register");
     };
     const handleRedirectLogin = async () => {
       await AsyncStorage.setItem("ku_onboarding", "true");
-      router.replace("/login");
+      router.replace("/(noaccess)/login");
     };
 
 

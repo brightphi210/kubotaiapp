@@ -1,265 +1,470 @@
-import MaterialIcons from '@expo/vector-icons/MaterialIcons'
+import { SolidMainButton } from '@/components/Btns'
+import Header from '@/components/Header'
+import { Ionicons } from '@expo/vector-icons'
+import { StatusBar } from 'expo-status-bar'
 import React, { useState } from 'react'
-import {
-  ScrollView,
-  Text,
-  TouchableOpacity,
-  View
-} from 'react-native'
-import { SafeAreaView } from 'react-native-safe-area-context'
+import { Image, Modal, Pressable, ScrollView, Text, TouchableOpacity, View } from 'react-native'
 
-const Task = () => {
-  const [activeTab, setActiveTab] = useState(true)
-  const [completedTab, setCompletedTab] = useState(false)
-  
-  // Active tasks data
-  const activeTasks = [
-    { id: 1, title: 'Join Tonstation', reward: 5000, status: 'claim', type: 'social', icon: 'group' },
-    { id: 2, title: 'Follow on Twitter', reward: 2500, status: 'join', type: 'social', icon: 'campaign' },
-    { id: 3, title: 'Join Telegram', reward: 5000, status: 'claim', type: 'social', icon: 'chat' },
-    { id: 4, title: 'Share with Friends', reward: 1000, status: 'claim', type: 'referral', icon: 'share' },
-    { id: 5, title: 'Complete Daily Check-in', reward: 500, status: 'join', type: 'daily', icon: 'check-circle' },
-    { id: 6, title: 'Watch Tutorial Video', reward: 3000, status: 'join', type: 'education', icon: 'play-circle-filled' },
-  ]
-  
-  // Completed tasks data  
-  const completedTasks = [
-    { id: 7, title: 'Download App', reward: 1000, status: true, type: 'onboarding', icon: 'download' },
-    { id: 8, title: 'Create Account', reward: 2000, status: true, type: 'onboarding', icon: 'person-add' },
-    { id: 9, title: 'Verify Email', reward: 1500, status: true, type: 'onboarding', icon: 'email' },
-    { id: 10, title: 'First Login', reward: 1000, status: true, type: 'milestone', icon: 'login' },
-    { id: 11, title: 'Profile Setup', reward: 2500, status: true, type: 'onboarding', icon: 'person' },
-  ]
+const Tasks = () => {
+  const [activeTab, setActiveTab] = useState<'active' | 'completed'>('active')
+  const [selectedTask, setSelectedTask] = useState<any>(null)
+  const [showBottomSheet, setShowBottomSheet] = useState(false)
+  const [activeTasks, setActiveTasks] = useState([
+    {
+      id: 1,
+      image: 'https://images.unsplash.com/photo-1633356122544-f134324a6cee?w=100&h=100&fit=crop',
+      title: 'Complete Survey on User Experience',
+      description: 'Share your feedback on our platform',
+      tokens: 150,
+      duration: '5-10 min',
+      taskUrl: 'https://example.com/survey',
+      difficulty: 'easy',
+      category: 'Survey'
+    },
+    {
+      id: 2,
+      image: 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=100&h=100&fit=crop',
+      title: 'Watch Marketing Video',
+      description: 'Watch and engage with promotional content',
+      tokens: 50,
+      duration: '2-3 min',
+      taskUrl: 'https://example.com/video',
+      difficulty: 'easy',
+      category: 'Video'
+    },
+    {
+      id: 3,
+      image: 'https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?w=100&h=100&fit=crop',
+      title: 'Data Entry Task',
+      description: 'Input data from provided documents',
+      tokens: 200,
+      duration: '15-20 min',
+      taskUrl: 'https://example.com/data-entry',
+      difficulty: 'medium',
+      category: 'Data'
+    }
+  ])
 
-  // Active task handlers
-  const handleActiveTaskJoin = (taskId: number) => {
-    console.log(`Active Task ${taskId} - Action: Join`)
-    // Add your join logic here
+  const [completedTasks, setCompletedTasks] = useState([
+    {
+      id: 4,
+      image: 'https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=100&h=100&fit=crop',
+      date: 'Oct 17, 2025',
+      time: '11:20 AM',
+      title: 'Product Review Task',
+      tokens: 100
+    },
+    {
+      id: 5,
+      image: 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=100&h=100&fit=crop',
+      date: 'Oct 16, 2025',
+      time: '3:00 PM',
+      title: 'Social Media Engagement',
+      tokens: 75
+    }
+  ])
+
+  const [taskCompleted, setTaskCompleted] = useState(false)
+
+  const handleTaskPress = (task: any) => {
+    setSelectedTask(task)
+    setTaskCompleted(false)
+    setShowBottomSheet(true)
   }
 
-  const handleActiveTaskClaim = (taskId: number) => {
-    console.log(`Active Task ${taskId} - Action: Claim`)
-    // Add your claim logic here
+  const handlePerformTask = () => {
+    setTaskCompleted(true)
   }
 
-  // Completed task handler
-  const handleCompletedTaskView = (taskId: number) => {
-    console.log(`Completed Task ${taskId} - Action: View`)
-    // Add your view logic here
-  }
-
-  // Active Task Item Component
-  const ActiveTaskItem = ({ task }: { task: any }) => (
-    <View className="flex-row items-center justify-between py-4 mb-5 bg-neutral-950 rounded-xl border-b border-neutral-900">
-      <View className="flex-row items-center flex-1">
-        <View className="w-10 h-10 bg-black rounded-lg mr-3 justify-center items-center">
-          <MaterialIcons name={task.icon as any} size={20} color={'white'} />
-        </View>
-        
-        <View className="flex-1">
-          <Text className="text-white text-base font-medium mb-1" style={{fontFamily: 'HankenGrotesk_500Medium'}}>
-            {task.title}
-          </Text>
-          <Text className="text-neutral-400 text-sm" style={{fontFamily: 'HankenGrotesk_400Regular'}}>
-            +{task.reward.toLocaleString()} Kubot
-          </Text>
-        </View>
-      </View>
+  const handleClaimTokens = () => {
+    if (selectedTask) {
+      const completedTask = {
+        ...selectedTask,
+        date: new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
+        time: new Date().toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' })
+      }
       
-      {task.status === 'join' ? (
-        <TouchableOpacity
-          onPress={() => handleActiveTaskJoin(task.id)}
-          className="px-6 py-2 rounded-full bg-blue-500"
-        >
-          <Text 
-            className="text-sm font-medium text-white"
-            style={{fontFamily: 'HankenGrotesk_500Medium'}}
-          >
-            Join
-          </Text>
-        </TouchableOpacity>
-      ) : (
-        <TouchableOpacity
-          onPress={() => handleActiveTaskClaim(task.id)}
-          className="px-6 py-2 rounded-full bg-transparent border border-blue-500"
-        >
-          <Text 
-            className="text-sm font-medium text-blue-500"
-            style={{fontFamily: 'HankenGrotesk_500Medium'}}
-          >
-            Claim
-          </Text>
-        </TouchableOpacity>
-      )}
-    </View>
-  )
+      setCompletedTasks([completedTask, ...completedTasks])
+      setActiveTasks(activeTasks.filter(task => task.id !== selectedTask.id))
+      setShowBottomSheet(false)
+      setSelectedTask(null)
+    }
+  }
 
-  // Completed Task Item Component
-  const CompletedTaskItem = ({ task }: { task: any }) => (
-    <View className="flex-row items-center justify-between py-4 mb-5 bg-neutral-950 rounded-xl border-b border-neutral-900">
-      <View className="flex-row items-center flex-1">
-        <View className="w-10 h-10 bg-green-900 rounded-lg mr-3 justify-center items-center">
-          <MaterialIcons name={task.icon as any} size={20} color={'#22c55e'} />
-        </View>
-        
-        <View className="flex-1">
-          <Text className="text-white text-base font-medium mb-1" style={{fontFamily: 'HankenGrotesk_500Medium'}}>
-            {task.title}
-          </Text>
-          <Text className="text-green-400 text-sm" style={{fontFamily: 'HankenGrotesk_400Regular'}}>
-            +{task.reward.toLocaleString()} Kubot Earned
-          </Text>
-        </View>
-      </View>
-      
-      <TouchableOpacity
-        onPress={() => handleCompletedTaskView(task.id)}
-        className="px-6 py-2 rounded-full bg-gray-600"
-      >
-        <Text 
-          className="text-sm font-medium text-gray-300"
-          style={{fontFamily: 'HankenGrotesk_500Medium'}}
-        >
-          Completed
-        </Text>
-      </TouchableOpacity>
-    </View>
-  )
+  const getDifficultyColor = (difficulty: string) => {
+    switch(difficulty) {
+      case 'easy': return '#10B981'
+      case 'medium': return '#F59E0B'
+      case 'hard': return '#EF4444'
+      default: return '#6B7280'
+    }
+  }
+
+  const totalTokensAvailable = activeTasks.reduce((sum, task) => sum + task.tokens, 0)
 
   return (
-    <SafeAreaView className="flex-1" style={{ backgroundColor: '#0a0a0a' }}>
-      <ScrollView className="flex-1 px-6" showsVerticalScrollIndicator={false}>
-        
-        {/* Header */}
-        <View className="py-8 pt-12">
-          <Text className="text-2xl font-bold text-white text-center mb-3" style={{fontFamily: 'HankenGrotesk_700Bold'}}>
-            Task
-          </Text>
-          <Text className="text-neutral-400 text-center text-lg leading-6" style={{fontFamily: 'HankenGrotesk_400Regular'}}>
-            Get Rewarded for{'\n'}Completing a task
-          </Text>
-        </View>
+    <View className="flex-1" style={{ backgroundColor: '#F9FAFB' }}>
+      <StatusBar style='light'/> 
+      <Header text='Tasks'/>
 
-        {/* Tab Navigation */}
-        <View className="flex-row justify-between gap-3 mb-4 bg-neutral-900 rounded-2xl p-1.5 border border-neutral-800">
-          <TouchableOpacity
-              onPress={() => {setActiveTab(true); setCompletedTab(false)}}
-              className={`py-4 rounded-xl flex-1`}
-              style={{backgroundColor: activeTab ? '#016FEC' : '#1A1A1A'}}
-              // className={`py-4 rounded-xl ${activeTab === true && 'bg-[#016FEC] shadow-lg'}`}
-              
-            >
-              <Text 
-                className={`text-center font-semibold text-base ${
-                  activeTab === true ? 'text-white' : 'text-neutral-400'
-                }`}
-                style={{fontFamily: 'HankenGrotesk_600SemiBold'}}
-              >
-                Active
+      {/* Stats Card */}
+      <View className='mx-6 mt-4 mb-4'>
+        <View 
+          className='rounded-2xl p-5 overflow-hidden bg-[#011730]'
+        >
+          <View className='flex-row justify-between items-center mb-3'>
+            <View>
+              <Text className='text-xs text-gray-300' style={{ fontFamily: 'HankenGrotesk_400Regular'}}>
+                Available Tasks
               </Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity
-              onPress={() => {setCompletedTab(true); setActiveTab(false)}}
-              className={`py-4 rounded-xl flex-1`}
-              style={{backgroundColor: completedTab === true ? '#016FEC' : '#1A1A1A'}}
-              // className={`py-4 rounded-xl ${completedTab === true && 'bg-[#016FEC] shadow-lg'}`}
-            >
-              <Text 
-                className={`text-center font-semibold text-base ${
-                  completedTab === true ? 'text-white' : 'text-neutral-400'
-                }`}
-                style={{fontFamily: 'HankenGrotesk_600SemiBold'}}
-              >
-                Completed
+              <Text className='text-xl text-white' style={{ fontFamily: 'HankenGrotesk_700Bold' }}>
+                {activeTasks.length}
               </Text>
-          </TouchableOpacity>
-        </View>
-
-        {/* Tab Content */}
-        {activeTab === true && (
-          <View>
-            {/* Active Task Stats Banner */}
-            <View className="bg-neutral-900 border border-neutral-800 rounded-2xl px-6 py-3 mb-4">
-              <View className="flex-row justify-between items-center">
-                <View>
-                  <Text className="text-green-500 text-2xl text-center font-bold" style={{fontFamily: 'HankenGrotesk_700Bold'}}>
-                    {activeTasks.filter(t => t.status === 'claim').length}
-                  </Text>
-                  <Text className="text-neutral-300 text-xs" style={{fontFamily: 'HankenGrotesk_400Regular'}}>
-                    Ready to Claim
-                  </Text>
-                </View>
-                <View>
-                  <Text className="text-green-500 text-2xl text-center font-bold" style={{fontFamily: 'HankenGrotesk_700Bold'}}>
-                    {activeTasks.filter(t => t.status === 'join').length}
-                  </Text>
-                  <Text className="text-neutral-300 text-xs" style={{fontFamily: 'HankenGrotesk_400Regular'}}>
-                    Available Tasks
-                  </Text>
-                </View>
-                <View>
-                  <Text className="text-green-500 text-lg text-center font-bold" style={{fontFamily: 'HankenGrotesk_700Bold'}}>
-                    {activeTasks.reduce((sum, task) => sum + task.reward, 0).toLocaleString()}
-                  </Text>
-                  <Text className="text-neutral-300 text-xs" style={{fontFamily: 'HankenGrotesk_400Regular'}}>
-                    Total Rewards
-                  </Text>
-                </View>
+            </View>
+            <View className='items-end'>
+              <Text className='text-xs text-gray-300' style={{ fontFamily: 'HankenGrotesk_400Regular'}}>
+                Total Rewards
+              </Text>
+              <View className='flex-row items-center mt-1'>
+                <Text className='text-xl text-yellow-400' style={{ fontFamily: 'HankenGrotesk_700Bold'}}>
+                  {totalTokensAvailable}
+                </Text>
+                <Text className='text-xl text-yellow-400' style={{ fontFamily: 'HankenGrotesk_700Bold'}}>
+                  KU
+                </Text>
               </View>
             </View>
-
-            {/* Active Task List */}
-            <View className="pb-6">
-              {activeTasks.map((task) => (
-                <ActiveTaskItem key={task.id} task={task} />
-              ))}
-            </View>
           </View>
-        )}
-        {completedTab === true && (
-          <View>
-              <View className="bg-neutral-900 border border-neutral-800 rounded-2xl px-6 py-3 mb-4">
-                <View className="flex-row justify-between items-center">
-                  <View>
-                    <Text className="text-green-500 text-2xl text-center font-bold" style={{fontFamily: 'HankenGrotesk_700Bold'}}>
-                      {completedTasks.length}
-                    </Text>
-                    <Text className="text-neutral-300 text-xs" style={{fontFamily: 'HankenGrotesk_400Regular'}}>
-                      Tasks Completed
-                    </Text>
+          
+          <View className='flex-row items-center'>
+            <View className='flex-1 h-2 bg-white/20 rounded-full overflow-hidden'>
+              <View 
+                style={{ 
+                  width: completedTasks.length > 0 ? `${(completedTasks.length / (activeTasks.length + completedTasks.length)) * 100}%` : '0%',
+                  height: '100%',
+                  backgroundColor: '#FCD34D',
+                  borderRadius: 999
+                }}
+              />
+            </View>
+            <Text className='text-xs text-gray-300' style={{ fontFamily: 'HankenGrotesk_400Regular', marginLeft: 20 }}>
+              {completedTasks.length} completed
+            </Text>
+          </View>
+        </View>
+      </View>
+
+      {/* Tabs */}
+      <View className='px-6 flex-row gap-3 mb-4'>
+        <TouchableOpacity 
+          onPress={() => setActiveTab('active')}
+          className='flex-1 py-3 rounded-lg items-center'
+          style={{ 
+            backgroundColor: activeTab === 'active' ? '#DEECFD' : '#FFFFFF',
+          }}
+        >
+          <Text 
+            style={{ 
+              fontFamily: 'HankenGrotesk_700Bold',
+              color: activeTab === 'active' ? '#016FEC' : '#6B7280',
+            }}
+            className='text-sm'
+          >
+            Active
+          </Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity 
+          onPress={() => setActiveTab('completed')}
+          className='flex-1 py-3 rounded-lg items-center'
+          style={{ 
+            backgroundColor: activeTab === 'completed' ? '#DEECFD' : '#FFFFFF',
+          }}
+        >
+          <Text 
+            className='text-sm'
+            style={{ 
+              fontFamily: 'HankenGrotesk_700Bold',
+              color: activeTab === 'completed' ? '#016FEC' : '#6B7280',
+            }}
+          >
+            Completed
+          </Text>
+        </TouchableOpacity>
+      </View>
+
+      <ScrollView className='px-6 pt-5' showsVerticalScrollIndicator={false}>
+        {activeTab === 'active' ? (
+          <>
+            {activeTasks.length === 0 ? (
+              <View className='items-center justify-center py-20'>
+                <View className='w-24 h-24 rounded-full bg-gray-100 items-center justify-center mb-4'>
+                  <Text style={{ fontSize: 40 }}>📋</Text>
+                </View>
+                <Text style={{ fontFamily: 'HankenGrotesk_600SemiBold', color: '#9CA3AF', fontSize: 16 }}>
+                  No active tasks available
+                </Text>
+                <Text style={{ fontFamily: 'HankenGrotesk_400Regular', color: '#D1D5DB', fontSize: 14, marginTop: 4 }}>
+                  Check back later for new tasks
+                </Text>
+              </View>
+            ) : (
+              activeTasks.map((task) => (
+                <TouchableOpacity
+                  key={task.id}
+                  onPress={() => handleTaskPress(task)}
+                  activeOpacity={0.9}
+                >
+                  <View 
+                    className='bg-white rounded-lg p-4 mb-4 border border-gray-100'
+                  >
+                    <View className='flex-row items-start mb-3'>
+                      <View style={{ position: 'relative' }}>
+                        <Image 
+                          source={{ uri: task.image }}
+                          style={{ 
+                            width: 60, 
+                            height: 60, 
+                            borderRadius: 8, 
+                            backgroundColor: '#E5E7EB'
+                          }}
+                        />
+                      </View>
+
+                      <View className='flex-1 ml-3'>
+                        <View className='flex-row items-center justify-between mb-1'>
+                          <View className='px-2 py-0.5 rounded bg-blue-50 mr-2'>
+                            <Text style={{ 
+                              fontFamily: 'HankenGrotesk_600SemiBold', 
+                              color: '#3B82F6', 
+                              fontSize: 10 
+                            }}>
+                              {task.category}
+                            </Text>
+                          </View>
+                          <Text className='text-xs text-gray-400' style={{ fontFamily: 'HankenGrotesk_500Medium' }}>
+                            {task.duration}
+                          </Text>
+                        </View>
+                        <Text className='text-base mb-1' style={{ fontFamily: 'HankenGrotesk_700Bold', color: '#111827' }}>
+                          {task.title}
+                        </Text>
+                        <Text className='text-sm text-gray-400' style={{ fontFamily: 'HankenGrotesk_400Regular' }} numberOfLines={2}>
+                          {task.description}
+                        </Text>
+                      </View>
+                    </View>
+
+                    <View 
+                      className='flex-row items-center justify-between rounded-xl'
+                    >
+                      <View className='flex-row items-center'>
+                        <Text style={{ fontSize: 14, marginRight: 6 }}>🪙</Text>
+                        <View>
+                          <Text className='text-base text-green-800' style={{ fontFamily: 'HankenGrotesk_600SemiBold' }}>
+                            +{task.tokens} KU
+                          </Text>
+                        </View>
+                      </View>
+                      
+                      <View 
+                        className='px-4 py-2 rounded-md flex-row items-center gap-2'
+                        style={{ backgroundColor: '#016FEC' }}
+                      >
+                        <Text className='text-sm text-white' style={{ fontFamily: 'HankenGrotesk_500Medium' }}>
+                          Start
+                        </Text>
+
+                        <Ionicons name='arrow-forward' size={13} color={'white'}/>
+                      </View>
+                    </View>
                   </View>
-                  <View>
-                    <Text className="text-green-500 text-lg text-center font-bold" style={{fontFamily: 'HankenGrotesk_700Bold'}}>
-                      {completedTasks.reduce((sum, task) => sum + task.reward, 0).toLocaleString()}
-                    </Text>
-                    <Text className="text-neutral-300 text-xs" style={{fontFamily: 'HankenGrotesk_400Regular'}}>
-                      Total Earned
-                    </Text>
+                </TouchableOpacity>
+              ))
+            )}
+          </>
+        ) : (
+          <>
+            {completedTasks.length === 0 ? (
+              <View className='items-center justify-center py-20'>
+                <View className='w-24 h-24 rounded-full bg-gray-100 items-center justify-center mb-4'>
+                  <Text style={{ fontSize: 40 }}>✅</Text>
+                </View>
+                <Text style={{ fontFamily: 'HankenGrotesk_600SemiBold', color: '#9CA3AF', fontSize: 16 }}>
+                  No completed tasks yet
+                </Text>
+                <Text style={{ fontFamily: 'HankenGrotesk_400Regular', color: '#D1D5DB', fontSize: 14, marginTop: 4 }}>
+                  Complete tasks to earn tokens
+                </Text>
+              </View>
+            ) : (
+              completedTasks.map((task, index) => (
+                <View 
+                  key={task.id}
+                  className='bg-white rounded-2xl p-4 mb-4 flex-row items-center'
+                  style={{ 
+                    shadowColor: '#000',
+                    shadowOffset: { width: 0, height: 2 },
+                    shadowOpacity: 0.06,
+                    shadowRadius: 8,
+                    elevation: 2,
+                    borderWidth: 1,
+                    borderColor: '#F3F4F6'
+                  }}
+                >
+                  <View className='relative'>
+                    <Image 
+                      source={{ uri: task.image }}
+                      style={{ width: 56, height: 56, borderRadius: 12, backgroundColor: '#E5E7EB' }}
+                    />
+                    <View 
+                      className='absolute -bottom-1 -right-1 w-6 h-6 rounded-full items-center justify-center'
+                      style={{ backgroundColor: '#10B981' }}
+                    >
+                      <Text style={{ color: '#FFFFFF', fontSize: 14 }}>✓</Text>
+                    </View>
                   </View>
-                  <View>
-                    <Text className="text-green-500 text-lg text-center font-bold" style={{fontFamily: 'HankenGrotesk_700Bold'}}>
-                      {Math.round(completedTasks.reduce((sum, task) => sum + task.reward, 0) / completedTasks.length).toLocaleString()}
+
+                  <View className='flex-1 ml-3'>
+                    <Text className='text-base mb-0.5' style={{ fontFamily: 'HankenGrotesk_700Bold', color: '#111827' }} numberOfLines={1}>
+                      {task.title}
                     </Text>
-                    <Text className="text-neutral-300 text-xs" style={{fontFamily: 'HankenGrotesk_400Regular'}}>
-                      Avg. Reward
+                    <Text className='text-xs text-gray-400 mb-1' style={{ fontFamily: 'HankenGrotesk_500Medium' }}>
+                      {task.date} • {task.time}
                     </Text>
+                    <View className='flex-row items-center'>
+                      <View className='px-2 py-0.5 rounded bg-green-50'>
+                        <Text style={{ fontFamily: 'HankenGrotesk_600SemiBold', color: '#10B981', fontSize: 10 }}>
+                          CLAIMED
+                        </Text>
+                      </View>
+                    </View>
+                  </View>
+
+                  <View className='items-end'>
+                    <View 
+                      className='px-3 py-1.5 rounded-lg'
+                      style={{ backgroundColor: '#DCFCE7' }}
+                    >
+                      <Text className='text-base' style={{ fontFamily: 'HankenGrotesk_700Bold', color: '#16A34A' }}>
+                        +{task.tokens}
+                      </Text>
+                      <Text className='text-xs' style={{ fontFamily: 'HankenGrotesk_600SemiBold', color: '#16A34A' }}>
+                        KU
+                      </Text>
+                    </View>
                   </View>
                 </View>
-              </View>
-
-              {/* Completed Task List */}
-              <View className="pb-6">
-                {completedTasks.map((task) => (
-                  <CompletedTaskItem key={task.id} task={task} />
-                ))}
-              </View>
-          </View>
+              ))
+            )}
+          </>
         )}
 
+        <View style={{ height: 20 }} />
       </ScrollView>
-    </SafeAreaView>
+
+      {/* Enhanced Bottom Sheet Modal */}
+      <Modal
+        visible={showBottomSheet}
+        transparent={true}
+        animationType="slide"
+        onRequestClose={() => setShowBottomSheet(false)}
+      >
+        <Pressable 
+          className='flex-1 justify-end'
+          style={{ backgroundColor: 'rgba(0, 0, 0, 0.6)' }}
+          onPress={() => setShowBottomSheet(false)}
+        >
+          <Pressable 
+            className='bg-white rounded-t-xl'
+            style={{ maxHeight: '85%' }}
+            onPress={(e) => e.stopPropagation()}
+          >
+            <View className='items-center py-4'>
+              <View style={{ width: 40, height: 4, backgroundColor: '#D1D5DB', borderRadius: 2 }} />
+            </View>
+
+            <ScrollView className='px-6 pb-6' showsVerticalScrollIndicator={false}>
+              {selectedTask && (
+                <>
+                  <View className=' mb-6 '>
+                    <View className='flex-row gap-4' >
+                      <Image 
+                        source={{ uri: selectedTask.image }}
+                        style={{ 
+                          width: 80, 
+                          height: 70, 
+                          borderRadius: 6, 
+                        }}
+                      />
+                     
+                     <View>
+
+                        <Text className='text-lg ' style={{ fontFamily: 'HankenGrotesk_700Bold', color: '#111827' }}>
+                          {selectedTask.title}
+                        </Text>
+
+                        <Text className='text-base  text-gray-600' style={{ fontFamily: 'HankenGrotesk_400Regular' }}>
+                          {selectedTask.description}
+                        </Text>
+
+                        {selectedTask.category && (
+                          <View className='flex-row mt-1'>
+                            <View className='px-3 py-1 rounded-full bg-blue-50'>
+                              <Text className='text-xs' style={{ fontFamily: 'HankenGrotesk_600SemiBold', color: '#3B82F6' }}>
+                                {selectedTask.category}
+                              </Text>
+                            </View>
+                          </View>
+                        )}
+                     </View>
+                    </View>
+                  </View>
+
+                  {!taskCompleted ? (
+                    <>
+                      <View className='bg-blue-50 rounded-xl p-4 mb-4'>
+                        <Text className='text-xs text-blue-900 text-center' style={{ fontFamily: 'HankenGrotesk_500Medium' }}>
+                          💡 Complete the task to unlock your reward.
+                        </Text>
+                      </View>
+
+                      <SolidMainButton onPress={handlePerformTask} text='Perform Task'/>
+                    </>
+                  ) : (
+                    <>
+                      <View 
+                        className='rounded-2xl bg-green-50 p-2 mb-4'
+                      >
+                        <View className='items-center'>
+                          <Text style={{ fontSize: 20, marginBottom: 8 }}>🎉</Text>
+                          <Text className='text-sm text-green-800 text-center' style={{ fontFamily: 'HankenGrotesk_700Bold' }}>
+                            Task Completed!
+                          </Text>
+                          <Text className='text-xs text-green-700 text-center mt-2' style={{ fontFamily: 'HankenGrotesk_500Medium' }}>
+                            Amazing work! Your tokens are ready to claim
+                          </Text>
+                        </View>
+                      </View>
+
+                      <TouchableOpacity 
+                        onPress={handleClaimTokens}
+                        className='flex items-center gap-4 bg-green-800 p-4 py-5 w-full rounded-lg'
+                      >
+                        <Text className='text-white text-[13px]' style={{ fontFamily: 'HankenGrotesk_700Bold'}}>
+                          🪙 Claim {selectedTask.tokens} KU Tokens
+                        </Text>
+                      </TouchableOpacity>
+                    </>
+                  )}
+                </>
+              )}
+            </ScrollView>
+          </Pressable>
+        </Pressable>
+      </Modal>
+    </View>
   )
 }
 
-export default Task
+export default Tasks

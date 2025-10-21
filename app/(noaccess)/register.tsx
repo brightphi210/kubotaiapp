@@ -18,6 +18,7 @@ interface RegisterFormData {
     fullname: string;
     phone_number: string;
     email: string;
+    code: string;
     password: string;
     password2: string;
 }
@@ -40,6 +41,7 @@ const Register = () => {
         fullname: "",
         phone_number: "",
         email: "",
+        code: "",
         password: "",
         password2: "",
     },
@@ -51,6 +53,7 @@ const Register = () => {
       fullname: data.fullname,
       phone_number: data.phone_number,
       email: data.email,
+      code: data.code,
       password: data.password,
       password2: data.password2,
     };
@@ -202,6 +205,44 @@ const Register = () => {
               <ErrorMessage
                 errors={errors}
                 name="email"
+                render={({ message }) => (
+                  <Text className="pl-2 pt-3 text-sm text-red-600">
+                    {message}
+                  </Text>
+                )}
+              />
+            </Animated.View>
+
+            <Animated.View className='mb-5' entering={FadeInDown.duration(500).delay(200).springify()}>
+              <Text style={styles.titleStyle}>Invite Code</Text>
+              <Controller
+                name="code"
+                control={control}
+                rules={{
+                  required: "Code is required",
+                  pattern: {
+                    value: /^[A-Za-z0-9]+$/,
+                    message: "Invalid code number"
+                  }
+                }}
+                render={({ field: { onChange, onBlur, value } }) => (
+                  <TextInput 
+                    placeholder='E.g - KUBA1234d'
+                    placeholderTextColor={"#AFAFAF"}
+                    onChangeText={onChange}
+                    onBlur={onBlur}
+                    value={value}
+                    keyboardType="default"
+                    style={styles.inputStyle}
+                    autoCapitalize="none"
+                    autoCorrect={false}
+                    editable={!isPending}
+                  />
+                )}
+              />
+              <ErrorMessage
+                errors={errors}
+                name="code"
                 render={({ message }) => (
                   <Text className="pl-2 pt-3 text-sm text-red-600">
                     {message}
