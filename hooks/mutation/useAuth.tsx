@@ -38,7 +38,6 @@ export const useUpdateUserProfile = () => {
       return put_request_with_image(`/users/profile`, data, token)
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["user-profile"] })
       queryClient.invalidateQueries({ queryKey: ["profile"] })
     },
   })

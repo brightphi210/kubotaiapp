@@ -27,7 +27,7 @@ export const useGetProfile = () => {
     queryKey: ["profile"],
     queryFn: async () => {
       const token = (await AsyncStorage.getItem("ku_token")) || "";
-      return get_requests(`/users/profile`, token);
+      return get_requests(`/users/profile/`, token);
     },
   });
 

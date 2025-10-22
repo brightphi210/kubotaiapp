@@ -12,7 +12,7 @@ import { Controller, useForm } from 'react-hook-form'
 import { Image, KeyboardAvoidingView, Platform, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native'
 import { useToast } from 'react-native-toast-notifications'
 
-const ProfileUpdate = () => {
+const ProfileEdit = () => {
   const { mutate: updateProfile, isPending: isUpdating } = useUpdateUserProfile()
   const { getProfile, isLoading, refetch } = useGetProfile()
   const [image, setImage] = useState<string | null>(null)
@@ -27,11 +27,11 @@ const ProfileUpdate = () => {
     setValue,
   } = useForm({
     defaultValues: {
-      fullName: '',
+    //   fullName: '',
       username: '',
-      email: '',
+    //   email: '',
       bio: '',
-      phone: ''
+    //   phone: ''
     },
   })
 
@@ -39,11 +39,11 @@ const ProfileUpdate = () => {
   useEffect(() => {
     if (profile && !isLoading) {
       reset({
-        fullName: profile?.data?.fullname || '',
+        // fullName: profile?.data?.fullname || '',
         username: profile?.data?.username || '',
-        email: profile?.data?.email || '',
+        // email: profile?.data?.email || '',
         bio: profile?.data?.bio || '',
-        phone: profile?.data?.phone_number || ''
+        // phone: profile?.data?.phone_number || ''
       })
 
       // Set existing profile picture if available
@@ -71,11 +71,11 @@ const ProfileUpdate = () => {
       const formData = new FormData()
       
       // Add text fields to FormData
-      formData.append('fullname', data.fullName)
+    //   formData.append('fullname', data.fullName)
       formData.append('username', data.username)
-      formData.append('email', data.email)
+    //   formData.append('email', data.email)
       formData.append('bio', data.bio)
-      formData.append('phone_number', data.phone)
+    //   formData.append('phone_number', data.phone)
 
       // Add image if selected AND it's a new local image (not an existing URL)
       if (image && !image.startsWith('http')) {
@@ -157,7 +157,7 @@ const ProfileUpdate = () => {
           </View>
 
           {/* Full Name Input */}
-          <View className='mb-5'>
+          {/* <View className='mb-5'>
             <Text style={styles.labelStyle} className='mb-2'>
               Full Name
             </Text>
@@ -192,7 +192,7 @@ const ProfileUpdate = () => {
                 <Text className='pl-2 pt-2 text-sm text-red-600'>{message}</Text>
               )}
             />
-          </View>
+          </View> */}
 
           {/* Username Input */}
           <View className='mb-5'>
@@ -237,7 +237,7 @@ const ProfileUpdate = () => {
           </View>
 
           {/* Email Input */}
-          <View className='mb-5'>
+          {/* <View className='mb-5'>
             <Text style={styles.labelStyle} className='mb-2'>
               Email
             </Text>
@@ -273,10 +273,10 @@ const ProfileUpdate = () => {
                 <Text className='pl-2 pt-2 text-sm text-red-600'>{message}</Text>
               )}
             />
-          </View>
+          </View> */}
 
           {/* Phone Input */}
-          <View className='mb-5'>
+          {/* <View className='mb-5'>
             <Text style={styles.labelStyle} className='mb-2'>
               Phone Number
             </Text>
@@ -312,7 +312,7 @@ const ProfileUpdate = () => {
                 <Text className='pl-2 pt-2 text-sm text-red-600'>{message}</Text>
               )}
             />
-          </View>
+          </View> */}
 
           {/* Bio Input */}
           <View className='mb-5'>
@@ -373,7 +373,7 @@ const ProfileUpdate = () => {
   )
 }
 
-export default ProfileUpdate
+export default ProfileEdit
 
 const styles = StyleSheet.create({
   inputStyle: {

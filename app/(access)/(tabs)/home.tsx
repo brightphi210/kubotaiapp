@@ -614,7 +614,7 @@ const Home = () => {
           <View className="flex-row flex-wrap justify-between">
             {getNewsData === undefined || getNewsData.length === 0 ?
               <View className='justify-center mt-10 m-auto'>
-                <MaterialIcons name='dataset' size={16} color={'gray'}/>
+                <MaterialIcons name='dataset' size={25} color={'gray'} style={{margin: 'auto'}}/>
                 <Text className='text-sm text-center text-gray-500'>No data available</Text>
               </View>: 
               <>
