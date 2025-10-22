@@ -1,11 +1,17 @@
 import { SolidMainButton } from '@/components/Btns'
 import Header from '@/components/Header'
+import LoadingOverlay from '@/components/LoadingOverlay'
+import { useGetTask } from '@/hooks/queries/allQueries'
 import { Ionicons } from '@expo/vector-icons'
 import { StatusBar } from 'expo-status-bar'
 import React, { useState } from 'react'
 import { Image, Modal, Pressable, ScrollView, Text, TouchableOpacity, View } from 'react-native'
 
 const Tasks = () => {
+
+  const {getTask, isLoading} = useGetTask()
+  const allTask = getTask
+  console.log('This is Task', allTask)
   const [activeTab, setActiveTab] = useState<'active' | 'completed'>('active')
   const [selectedTask, setSelectedTask] = useState<any>(null)
   const [showBottomSheet, setShowBottomSheet] = useState(false)
@@ -91,21 +97,13 @@ const Tasks = () => {
     }
   }
 
-  const getDifficultyColor = (difficulty: string) => {
-    switch(difficulty) {
-      case 'easy': return '#10B981'
-      case 'medium': return '#F59E0B'
-      case 'hard': return '#EF4444'
-      default: return '#6B7280'
-    }
-  }
-
   const totalTokensAvailable = activeTasks.reduce((sum, task) => sum + task.tokens, 0)
 
   return (
     <View className="flex-1" style={{ backgroundColor: '#F9FAFB' }}>
       <StatusBar style='light'/> 
       <Header text='Tasks'/>
+      <LoadingOverlay visible={isLoading}/>
 
       {/* Stats Card */}
       <View className='mx-6 mt-4 mb-4'>

@@ -58,3 +58,22 @@ export const useGetFriends = () => {
     refetch,
   };
 };
+
+export const useGetTask = () => {
+  const { data, isLoading, isError, isFetched, refetch } = useQuery({
+    queryKey: ["task"],
+    queryFn: async () => {
+      const token = (await AsyncStorage.getItem("ku_token")) || "";
+      return get_requests(`/tasks/claim-token/`, token);
+    },
+  });
+
+  return {
+    getTask: data,
+    isLoading,
+    isError,
+    isFetched,
+    refetch,
+  };
+};
+

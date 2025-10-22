@@ -42,8 +42,8 @@ const Home = () => {
   const getNewsData = getNews?.data.data
   const {getProfile, isLoading: profileLoading} = useGetProfile()
   const profileData = getProfile?.data.data
-  console.log('News data', getNewsData)
-  console.log('Profile Data data', profileData)
+  // console.log('News data', getNewsData)
+  // console.log('Profile Data data', profileData)
 
   // Pulse animation for mining
   useEffect(() => {

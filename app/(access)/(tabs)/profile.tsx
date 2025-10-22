@@ -153,7 +153,7 @@ const Profile = () => {
             <Text className="text-gray-400 text-lg">›</Text>
           </TouchableOpacity>
 
-          <TouchableOpacity className="flex-row items-center justify-between py-4 px-4 bg-gray-50 rounded-xl mb-2">
+          <TouchableOpacity onPress={()=>router.push('/(access)/(stacks)/about')} className="flex-row items-center justify-between py-4 px-4 bg-gray-50 rounded-xl mb-2">
             <View className="flex-row items-center">
               <View className="w-10 h-10 bg-gray-200 rounded-lg items-center justify-center mr-3">
                 <MaterialIcons name='settings' size={20} color={'gray'}/>

@@ -20,15 +20,6 @@ export const useLogin = () => {
 };
 
 
-export const useProfileUpdate = () => {
-  const registrationMutation = useMutation({
-    mutationFn: (data: any) => post_requests("/users/profile", data),
-  });
-
-  return registrationMutation;
-}
-
-
 export const useUpdateUserProfile = () => {
   const queryClient = useQueryClient()
 

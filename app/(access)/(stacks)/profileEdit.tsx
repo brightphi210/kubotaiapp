@@ -3,6 +3,7 @@ import Header from '@/components/Header'
 import LoadingOverlay from '@/components/LoadingOverlay'
 import { useUpdateUserProfile } from '@/hooks/mutation/useAuth'
 import { useGetProfile } from '@/hooks/queries/allQueries'
+import Ionicons from '@expo/vector-icons/Ionicons'
 import MaterialIcons from '@expo/vector-icons/MaterialIcons'
 import { ErrorMessage } from '@hookform/error-message'
 import * as ImagePicker from 'expo-image-picker'
@@ -27,11 +28,8 @@ const ProfileEdit = () => {
     setValue,
   } = useForm({
     defaultValues: {
-    //   fullName: '',
       username: '',
-    //   email: '',
       bio: '',
-    //   phone: ''
     },
   })
 
@@ -39,11 +37,8 @@ const ProfileEdit = () => {
   useEffect(() => {
     if (profile && !isLoading) {
       reset({
-        // fullName: profile?.data?.fullname || '',
         username: profile?.data?.username || '',
-        // email: profile?.data?.email || '',
         bio: profile?.data?.bio || '',
-        // phone: profile?.data?.phone_number || ''
       })
 
       // Set existing profile picture if available
@@ -71,11 +66,8 @@ const ProfileEdit = () => {
       const formData = new FormData()
       
       // Add text fields to FormData
-    //   formData.append('fullname', data.fullName)
       formData.append('username', data.username)
-    //   formData.append('email', data.email)
       formData.append('bio', data.bio)
-    //   formData.append('phone_number', data.phone)
 
       // Add image if selected AND it's a new local image (not an existing URL)
       if (image && !image.startsWith('http')) {
@@ -99,12 +91,36 @@ const ProfileEdit = () => {
         },
         onError: (error: any) => {
           console.error('Update error:', error)
-          toast.show('Error Updating Profile', { type: 'danger' })
+          
+          // Extract actual error message from API response
+          let errorMessage = 'Error Updating Profile'
+          
+          if (error?.response?.data?.message) {
+            errorMessage = error.response.data.message
+          } else if (error?.response?.data?.error) {
+            errorMessage = error.response.data.error
+          } else if (error?.message) {
+            errorMessage = error.message
+          }
+          
+          toast.show(errorMessage, { type: 'danger' })
         },
       })
-    } catch (error) {
+    } catch (error: any) {
       console.error('Submit error:', error)
-      toast.show('An error occurred', { type: 'danger' })
+      
+      // Extract actual error message
+      let errorMessage = 'An error occurred'
+      
+      if (error?.response?.data?.message) {
+        errorMessage = error.response.data.message
+      } else if (error?.response?.data?.error) {
+        errorMessage = error.response.data.error
+      } else if (error?.message) {
+        errorMessage = error.message
+      }
+      
+      toast.show(errorMessage, { type: 'danger' })
     }
   }
 
@@ -142,9 +158,7 @@ const ProfileEdit = () => {
                     resizeMode="cover"
                   />
                 ) : (
-                  <Text style={styles.avatarText}>
-                    {profile?.data?.fullname?.charAt(0)?.toUpperCase() || 'JD'}
-                  </Text>
+                  <Ionicons name="person" size={48} color="#FFFFFF" />
                 )}
               </View>
               <View style={styles.editBadge}>
@@ -155,44 +169,6 @@ const ProfileEdit = () => {
               Tap to change profile picture
             </Text>
           </View>
-
-          {/* Full Name Input */}
-          {/* <View className='mb-5'>
-            <Text style={styles.labelStyle} className='mb-2'>
-              Full Name
-            </Text>
-            <Controller
-              name="fullName"
-              control={control}
-              rules={{
-                required: 'Full name is required',
-                minLength: {
-                  value: 2,
-                  message: 'Full name must be at least 2 characters',
-                },
-              }}
-              render={({ field: { onChange, onBlur, value } }) => (
-                <TextInput 
-                  placeholder='Enter your full name'
-                  placeholderTextColor="#AFAFAF"
-                  onChangeText={onChange}
-                  onBlur={onBlur}
-                  value={value}
-                  style={styles.inputStyle}
-                  autoCapitalize="words"
-                  autoCorrect={false}
-                  editable={!isUpdating}
-                />
-              )}
-            />
-            <ErrorMessage
-              errors={errors}
-              name="fullName"
-              render={({ message }) => (
-                <Text className='pl-2 pt-2 text-sm text-red-600'>{message}</Text>
-              )}
-            />
-          </View> */}
 
           {/* Username Input */}
           <View className='mb-5'>
@@ -235,84 +211,6 @@ const ProfileEdit = () => {
               )}
             />
           </View>
-
-          {/* Email Input */}
-          {/* <View className='mb-5'>
-            <Text style={styles.labelStyle} className='mb-2'>
-              Email
-            </Text>
-            <Controller
-              name="email"
-              control={control}
-              rules={{
-                required: 'Email is required',
-                pattern: {
-                  value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
-                  message: 'Please enter a valid email address',
-                },
-              }}
-              render={({ field: { onChange, onBlur, value } }) => (
-                <TextInput 
-                  placeholder='Enter your email'
-                  placeholderTextColor="#AFAFAF"
-                  onChangeText={onChange}
-                  onBlur={onBlur}
-                  value={value}
-                  style={styles.inputStyle}
-                  keyboardType="email-address"
-                  autoCapitalize="none"
-                  autoCorrect={false}
-                  editable={!isUpdating}
-                />
-              )}
-            />
-            <ErrorMessage
-              errors={errors}
-              name="email"
-              render={({ message }) => (
-                <Text className='pl-2 pt-2 text-sm text-red-600'>{message}</Text>
-              )}
-            />
-          </View> */}
-
-          {/* Phone Input */}
-          {/* <View className='mb-5'>
-            <Text style={styles.labelStyle} className='mb-2'>
-              Phone Number
-            </Text>
-            <Controller
-              name="phone"
-              control={control}
-              rules={{
-                required: 'Phone number is required',
-                pattern: {
-                  value: /^\+?[1-9]\d{1,14}$/,
-                  message: 'Please enter a valid phone number',
-                },
-              }}
-              render={({ field: { onChange, onBlur, value } }) => (
-                <TextInput 
-                  placeholder='E.g - +2348094422763'
-                  placeholderTextColor="#AFAFAF"
-                  onChangeText={onChange}
-                  onBlur={onBlur}
-                  value={value}
-                  style={styles.inputStyle}
-                  keyboardType="phone-pad"
-                  autoCapitalize="none"
-                  autoCorrect={false}
-                  editable={!isUpdating}
-                />
-              )}
-            />
-            <ErrorMessage
-              errors={errors}
-              name="phone"
-              render={({ message }) => (
-                <Text className='pl-2 pt-2 text-sm text-red-600'>{message}</Text>
-              )}
-            />
-          </View> */}
 
           {/* Bio Input */}
           <View className='mb-5'>
