@@ -64,7 +64,7 @@ export const useGetTask = () => {
     queryKey: ["task"],
     queryFn: async () => {
       const token = (await AsyncStorage.getItem("ku_token")) || "";
-      return get_requests(`/tasks/claim-token/`, token);
+      return get_requests(`/tasks/`, token);
     },
   });
 
