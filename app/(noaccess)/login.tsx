@@ -104,7 +104,7 @@ const Login = () => {
           <OnboardHeader text='Welcome back!' description="Login to shop, send or track—it's quick and free."/>
           <View className='pt-10'>
 
-            <Animated.View className='mb-5' entering={FadeInDown.duration(500).springify()}>
+            <Animated.View className='mb-5' entering={FadeInDown.duration(200).springify()}>
               <Text style={styles.titleStyle}>Email Address</Text>
               <Controller
                 name="email"
@@ -143,7 +143,7 @@ const Login = () => {
               />
             </Animated.View>
 
-            <Animated.View className='mb-5' entering={FadeInDown.duration(600).delay(200).springify()}>
+            <Animated.View className='mb-5' entering={FadeInDown.duration(300).delay(100).springify()}>
               <Text style={styles.titleStyle}>Password</Text>
               <Controller
                 name="password"
@@ -194,7 +194,7 @@ const Login = () => {
               />
             </Animated.View>
 
-            <Animated.View className='flex-col gap-4' entering={FadeInDown.duration(600).delay(400).springify()}>
+            <Animated.View className='flex-col gap-4' entering={FadeInDown.duration(400).delay(200).springify()}>
               <SolidMainButton 
                 text={'Login'} 
                 onPress={handleSubmit(onSubmit)}

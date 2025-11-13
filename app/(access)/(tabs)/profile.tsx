@@ -8,6 +8,7 @@ import { StatusBar } from 'expo-status-bar'
 import React, { useState } from 'react'
 import { ActivityIndicator, Image, ScrollView, Text, TouchableOpacity, View } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
+import { Toast } from 'react-native-toast-notifications'
 
 const CustomModal = ({ visible, onClose, children }:any) => {
 if (!visible) return null;
@@ -44,9 +45,6 @@ const Profile = () => {
 
     const {isLoading, getProfile} = useGetProfile()
     const profile = getProfile?.data.data
-
-
-  
 
   return (
     <SafeAreaView className="flex-1 bg-white">
@@ -90,17 +88,7 @@ const Profile = () => {
                     <Text className="text-gray-700 text-sm font-medium">invite</Text>
                 </TouchableOpacity>
             </View>
-          {/* Event Center */}
-          <TouchableOpacity className="flex-row items-center justify-between py-4 px-4 bg-gray-50 rounded-xl mb-2">
-            <View className="flex-row items-center">
-              <View className="w-10 h-10 bg-gray-200 rounded-lg items-center justify-center mr-3">
-                <MaterialIcons name='calendar-month' size={20} color={'gray'}/>
-              </View>
-              <Text className="text-gray-800 font-medium text-base">Event Center</Text>
-            </View>
-            <Text className="text-gray-400 text-lg">›</Text>
-          </TouchableOpacity>
-
+          
           {/* Invitation Code */}
           <TouchableOpacity 
             onPress={()=>router.push('/(access)/(stacks)/invitationCode')} 
@@ -120,7 +108,7 @@ const Profile = () => {
           </TouchableOpacity>
 
           {/* Earning Team */}
-          <TouchableOpacity className="flex-row items-center justify-between py-4 px-4 bg-gray-50 rounded-xl mb-2">
+          <TouchableOpacity onPress={()=>router.push('/(access)/(tabs)/friends')} className="flex-row items-center justify-between py-4 px-4 bg-gray-50 rounded-xl mb-2">
             <View className="flex-row items-center">
               <View className="w-10 h-10 bg-gray-200 rounded-lg items-center justify-center mr-3">
                 <MaterialIcons name='people' size={20} color={'gray'}/>
@@ -131,7 +119,7 @@ const Profile = () => {
           </TouchableOpacity>
 
           {/* Account & Security */}
-          <TouchableOpacity className="flex-row items-center justify-between py-4 px-4 bg-gray-50 rounded-xl mb-2">
+          <TouchableOpacity onPress={()=>router.push('/(access)/(stacks)/change-password')} className="flex-row items-center justify-between py-4 px-4 bg-gray-50 rounded-xl mb-2">
             <View className="flex-row items-center">
               <View className="w-10 h-10 bg-gray-200 rounded-lg items-center justify-center mr-3">
                 <MaterialIcons name='security' size={20} color={'gray'}/>
@@ -143,7 +131,7 @@ const Profile = () => {
 
     
           {/* KYC Verification */}
-          <TouchableOpacity className="flex-row items-center justify-between py-4 px-4 bg-gray-50 rounded-xl mb-2">
+          <TouchableOpacity onPress={()=>{Toast.show('KYC verification coming Soon', {type: 'success'})}} className="flex-row items-center justify-between py-4 px-4 bg-gray-50 rounded-xl mb-2">
             <View className="flex-row items-center">
               <View className="w-10 h-10 bg-gray-200 rounded-lg items-center justify-center mr-3">
                 <Ionicons name='scan-outline' size={20} color={'gray'}/>
@@ -162,6 +150,18 @@ const Profile = () => {
             </View>
             <Text className="text-gray-400 text-lg">›</Text>
           </TouchableOpacity>
+
+          {/* Event Center */}
+          <TouchableOpacity onPress={()=>router.push('/(access)/(stacks)/feedback')} className="flex-row items-center justify-between py-4 px-4 bg-gray-50 rounded-xl mb-2">
+            <View className="flex-row items-center">
+              <View className="w-10 h-10 bg-gray-200 rounded-lg items-center justify-center mr-3">
+                <MaterialIcons name='feedback' size={20} color={'gray'}/>
+              </View>
+              <Text className="text-gray-800 font-medium text-base">Feedback</Text>
+            </View>
+            <Text className="text-gray-400 text-lg">›</Text>
+          </TouchableOpacity>
+
 
 
           {/* Feedback */}

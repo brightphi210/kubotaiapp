@@ -42,8 +42,8 @@ const Home = () => {
   const getNewsData = getNews?.data.data
   const {getProfile, isLoading: profileLoading} = useGetProfile()
   const profileData = getProfile?.data.data
-  // console.log('News data', getNewsData)
-  // console.log('Profile Data data', profileData)
+  console.log('News data', getNewsData)
+  console.log('Profile Data data', profileData)
 
   // Pulse animation for mining
   useEffect(() => {
@@ -386,7 +386,7 @@ const Home = () => {
           <View 
             className="w-full h-32 rounded-t-xl object-cover overflow-hidden justify-center items-center"
           >
-            <Image source={{uri: post.image_url}} className='w-full h-full object-cover'/>
+            <Image source={{uri: post?.image_url}} className='w-full h-full object-cover'/>
           </View>
           <Pressable className='absolute bottom-[-14px] right-1 bg-white/80 shadow rounded-full p-3 flex-row items-center' onPress={() => console.log('Share post', post.id)}>
             <Ionicons name='share-outline' size={16} color={'black'}/>
@@ -450,16 +450,16 @@ const Home = () => {
           
           <Pressable onPress={()=>router.push('/(access)/(tabs)/profile')} className="flex-row items-center">
             {
-              profileData.image === null || profileData.image === undefined ?
+              profileData?.image === null || profileData?.image === undefined ?
               <View className="w-10 h-10 bg-white/20 overflow-hidden object-cover rounded-full mr-3 justify-center items-center" style={{borderRadius: 50}}>
                 <Image source={require('../../../assets/images/avatar2.png')} className='w-full h-full object-cover'/>
               </View> :
               <View className="w-10 h-10 bg-white/20 overflow-hidden object-cover rounded-full mr-3 justify-center items-center" style={{borderRadius: 50}}>
-                <Image source={{uri: profileData.image}} className='w-full h-full object-cover'/>
+                <Image source={{uri: profileData?.image}} className='w-full h-full object-cover'/>
               </View>
             }
             <View>
-              {profileData.username &&
+              {profileData?.username &&
               <Text className="text-lg font-semibold text-white" style={{fontFamily: 'HankenGrotesk_600SemiBold'}}>
                 @{profileData.username.toUpperCase().slice(0, 8)}...
               </Text>
