@@ -9,14 +9,6 @@ import { Modal, ScrollView, Text, TouchableOpacity, View } from 'react-native'
 const About = () => {
   const [showDeleteModal, setShowDeleteModal] = useState(false)
 
-  const handleDeleteAccount = () => {
-    // Add your delete account logic here
-    console.log('Account deleted')
-    setShowDeleteModal(false)
-    // You might want to navigate to login or perform other actions
-    // router.replace('/(auth)/login')
-  }
-
   return (
     <View className="flex-1" style={{ backgroundColor: '#F9FAFB' }}>
       <StatusBar style='light'/> 

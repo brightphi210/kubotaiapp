@@ -22,7 +22,7 @@ export const useGetNews = () => {
 };
 
 
-export const useGetProfile = () => {
+export const  useGetProfile = () => {
   const { data, isLoading, isError, isFetched, refetch } = useQuery({
     queryKey: ["profile"],
     queryFn: async () => {
