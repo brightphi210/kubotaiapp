@@ -25,8 +25,8 @@ export const useUpdateUserProfile = () => {
 
   const updateProfile = useMutation({
     mutationFn: async (data: FormData) => {
-      const token = (await AsyncStorage.getItem("movebay_token")) || ""
-      return put_request_with_image(`/users/profile`, data, token)
+      const token = (await AsyncStorage.getItem("ku_token")) || ""
+      return put_request_with_image(`/users/profile/`, data, token)
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["profile"] })

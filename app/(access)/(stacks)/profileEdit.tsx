@@ -7,6 +7,7 @@ import Ionicons from '@expo/vector-icons/Ionicons'
 import MaterialIcons from '@expo/vector-icons/MaterialIcons'
 import { ErrorMessage } from '@hookform/error-message'
 import * as ImagePicker from 'expo-image-picker'
+import { router } from 'expo-router'
 import { StatusBar } from 'expo-status-bar'
 import React, { useEffect, useState } from 'react'
 import { Controller, useForm } from 'react-hook-form'
@@ -25,7 +26,6 @@ const ProfileEdit = () => {
     handleSubmit,
     formState: { errors },
     reset,
-    setValue,
   } = useForm({
     defaultValues: {
       username: '',
@@ -42,8 +42,12 @@ const ProfileEdit = () => {
       })
 
       // Set existing profile picture if available
-      if (profile?.data?.profile_picture) {
-        setImage(profile?.data?.profile_picture)
+      // Handle both direct URL and nested profile_picture property
+      const profilePicture = profile?.data?.profile_picture || profile?.data?.image
+      if (profilePicture) {
+        setImage(profilePicture)
+      } else {
+        setImage(null) // Explicitly set to null if no picture
       }
     }
   }, [profile, isLoading, reset])
@@ -76,7 +80,7 @@ const ProfileEdit = () => {
         const match = /\.(\w+)$/.exec(filename || '')
         const type = match ? `image/${match[1]}` : 'image/jpeg'
         
-        formData.append('profile_picture', {
+        formData.append('image', {
           uri: imageUri,
           name: filename || 'profile.jpg',
           type,
@@ -88,6 +92,7 @@ const ProfileEdit = () => {
           console.log('Profile updated:', response?.data)
           toast.show('Profile Updated Successfully', { type: 'success' })
           refetch()
+          router.back()
         },
         onError: (error: any) => {
           console.error('Update error:', error)
@@ -150,11 +155,7 @@ const ProfileEdit = () => {
                 {image ? (
                   <Image
                     source={{ uri: image }}
-                    style={{
-                      width: 100,
-                      height: 100,
-                      borderRadius: 50,
-                    }}
+                    style={styles.avatarImage}
                     resizeMode="cover"
                   />
                 ) : (
@@ -166,7 +167,7 @@ const ProfileEdit = () => {
               </View>
             </TouchableOpacity>
             <Text style={styles.imageHintStyle} className='mt-3 text-center'>
-              Tap to change profile picture
+              Tap to {image ? 'change' : 'add'} profile picture
             </Text>
           </View>
 
@@ -313,10 +314,10 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     overflow: 'hidden',
   },
-  avatarText: {
-    fontFamily: "HankenGrotesk_600SemiBold",
-    fontSize: 32,
-    color: '#FFFFFF',
+  avatarImage: {
+    width: 100,
+    height: 100,
+    borderRadius: 50,
   },
   editBadge: {
     position: 'absolute',

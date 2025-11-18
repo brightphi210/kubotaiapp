@@ -1,41 +1,39 @@
 import { SolidMainButton } from '@/components/Btns'
 import Header from '@/components/Header'
 import LoadingOverlay from '@/components/LoadingOverlay'
-import { useGetTask } from '@/hooks/queries/allQueries'
+import { useClaimToken } from '@/hooks/mutation/allMutation'
+import { useGetCompletedTask, useGetTask } from '@/hooks/queries/allQueries'
 import { Ionicons, MaterialIcons } from '@expo/vector-icons'
 import { StatusBar } from 'expo-status-bar'
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { Image, Modal, Pressable, ScrollView, Text, TouchableOpacity, View } from 'react-native'
 
 const Tasks = () => {
 
   const {getTask, isLoading} = useGetTask()
   const allTask = getTask?.data.data
+  const {getCompletedTask, isLoading: completedtaskLoading} = useGetCompletedTask()
+  const completedTasksFromAPI = getCompletedTask?.data?.data || []
+  
   console.log('This is Task', allTask)
   const [activeTab, setActiveTab] = useState<'active' | 'completed'>('active')
   const [selectedTask, setSelectedTask] = useState<any>(null)
+  const {mutate, isPending} = useClaimToken(selectedTask?.id)
+  
   const [showBottomSheet, setShowBottomSheet] = useState(false)
+  const [showSuccessModal, setShowSuccessModal] = useState(false)
+  const [claimedTokens, setClaimedTokens] = useState(0)
 
-  const [completedTasks, setCompletedTasks] = useState([
-    {
-      id: 4,
-      image: 'https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=100&h=100&fit=crop',
-      date: 'Oct 17, 2025',
-      time: '11:20 AM',
-      title: 'Product Review Task',
-      tokens: 100
-    },
-    {
-      id: 5,
-      image: 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=100&h=100&fit=crop',
-      date: 'Oct 16, 2025',
-      time: '3:00 PM',
-      title: 'Social Media Engagement',
-      tokens: 75
-    }
-  ])
+  const [completedTasks, setCompletedTasks] = useState([])
 
   const [taskCompleted, setTaskCompleted] = useState(false)
+
+  // Sync completed tasks from API
+  useEffect(() => {
+    if (completedTasksFromAPI && completedTasksFromAPI.length > 0) {
+      setCompletedTasks(completedTasksFromAPI)
+    }
+  }, [completedTasksFromAPI])
 
   const handleTaskPress = (task: any) => {
     setSelectedTask(task)
@@ -49,25 +47,56 @@ const Tasks = () => {
 
   const handleClaimTokens = () => {
     if (selectedTask) {
-      const completedTask = {
-        ...selectedTask,
-        date: new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
-        time: new Date().toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' })
-      }
-      
-      setCompletedTasks([completedTask, ...completedTasks])
-      setShowBottomSheet(false)
-      setSelectedTask(null)
+      // Call the mutation to claim tokens
+      mutate(undefined, {
+        onSuccess: (response) => {
+          console.log('Token claimed successfully:', response)
+          
+          // Create completed task object
+          const completedTask = {
+            id: selectedTask.id,
+            image: selectedTask.images,
+            date: new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
+            time: new Date().toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' }),
+            title: selectedTask.title,
+            tokens: selectedTask.reward_tokens,
+            category: selectedTask.category,
+            created_at: selectedTask.created_at
+          }
+          
+          // Update completed tasks
+          setCompletedTasks([completedTask, ...completedTasks])
+          
+          // Store claimed tokens for success modal
+          setClaimedTokens(selectedTask.reward_tokens)
+          
+          // Close bottom sheet and show success modal
+          setShowBottomSheet(false)
+          setShowSuccessModal(true)
+          setSelectedTask(null)
+          
+          // Auto close success modal after 3 seconds
+          setTimeout(() => {
+            setShowSuccessModal(false)
+          }, 3000)
+        },
+        onError: (error) => {
+          console.error('Error claiming token:', error)
+          // You can show an error modal here if needed
+          alert('Failed to claim tokens. Please try again.')
+        }
+      })
     }
   }
 
-  const totalTokensAvailable = allTask?.reduce((sum:any, task:any) => sum + task.reward_tokens, 0)
+  const totalTokensAvailable = allTask?.reduce((sum:any, task:any) => sum + task.reward_tokens, 0) || 0
+  const totalTokensEarned = completedTasks.reduce((sum:any, task:any) => sum + (task.tokens || 0), 0)
 
   return (
     <View className="flex-1" style={{ backgroundColor: '#F9FAFB' }}>
       <StatusBar style='light'/> 
       <Header text='Tasks'/>
-      <LoadingOverlay visible={isLoading}/>
+      <LoadingOverlay visible={isLoading || isPending}/>
 
       {/* Stats Card */}
       <View className='mx-6 mt-4 mb-4'>
@@ -91,7 +120,24 @@ const Tasks = () => {
                 <Text className='text-xl text-yellow-400' style={{ fontFamily: 'HankenGrotesk_700Bold'}}>
                   {totalTokensAvailable}
                 </Text>
-                <Text className='text-xl text-yellow-400' style={{ fontFamily: 'HankenGrotesk_700Bold'}}>
+                <Text className='text-xl text-yellow-400 ml-1' style={{ fontFamily: 'HankenGrotesk_700Bold'}}>
+                  KU
+                </Text>
+              </View>
+            </View>
+          </View>
+          
+          {/* Earned Tokens Section */}
+          <View className='mb-3 pt-3 border-t border-white/10'>
+            <View className='flex-row justify-between items-center'>
+              <Text className='text-xs text-gray-300' style={{ fontFamily: 'HankenGrotesk_400Regular'}}>
+                Tokens Earned
+              </Text>
+              <View className='flex-row items-center'>
+                <Text className='text-base text-green-400' style={{ fontFamily: 'HankenGrotesk_700Bold'}}>
+                  {totalTokensEarned}
+                </Text>
+                <Text className='text-base text-green-400 ml-1' style={{ fontFamily: 'HankenGrotesk_700Bold'}}>
                   KU
                 </Text>
               </View>
@@ -102,7 +148,7 @@ const Tasks = () => {
             <View className='flex-1 h-2 bg-white/20 rounded-full overflow-hidden'>
               <View 
                 style={{ 
-                  width: completedTasks.length > 0 ? `${(completedTasks.length / (allTask && allTask.length + completedTasks.length)) * 100}%` : '0%',
+                  width: completedTasks.length > 0 ? `${(completedTasks.length / ((allTask?.length || 0) + completedTasks.length)) * 100}%` : '0%',
                   height: '100%',
                   backgroundColor: '#FCD34D',
                   borderRadius: 999
@@ -418,10 +464,12 @@ const Tasks = () => {
 
                       <TouchableOpacity 
                         onPress={handleClaimTokens}
+                        disabled={isPending}
                         className='flex items-center gap-4 bg-green-800 p-4 py-5 w-full rounded-lg'
+                        style={{ opacity: isPending ? 0.6 : 1 }}
                       >
                         <Text className='text-white text-[13px]' style={{ fontFamily: 'HankenGrotesk_700Bold'}}>
-                          🪙 Claim {selectedTask.tokens} KU Tokens
+                          {isPending ? 'Claiming...' : `🪙 Claim ${selectedTask.reward_tokens} KU Tokens`}
                         </Text>
                       </TouchableOpacity>
                     </>
@@ -431,6 +479,89 @@ const Tasks = () => {
             </ScrollView>
           </Pressable>
         </Pressable>
+      </Modal>
+
+      {/* Success Modal */}
+      <Modal
+        visible={showSuccessModal}
+        transparent={true}
+        animationType="fade"
+      >
+        <View 
+          className='flex-1 justify-center items-center'
+          style={{ backgroundColor: 'rgba(0, 0, 0, 0.7)' }}
+        >
+          <View 
+            className='bg-white rounded-3xl p-8 mx-8 items-center'
+            style={{ 
+              shadowColor: '#000',
+              shadowOffset: { width: 0, height: 10 },
+              shadowOpacity: 0.3,
+              shadowRadius: 20,
+              elevation: 10,
+              maxWidth: 350,
+              width: '100%'
+            }}
+          >
+            <View 
+              className='w-20 h-20 rounded-full items-center justify-center mb-4'
+              style={{ backgroundColor: '#DCFCE7' }}
+            >
+              <Text style={{ fontSize: 48 }}>🎉</Text>
+            </View>
+            
+            <Text 
+              className='text-2xl text-center mb-2'
+              style={{ fontFamily: 'HankenGrotesk_700Bold', color: '#111827' }}
+            >
+              Success!
+            </Text>
+            
+            <Text 
+              className='text-sm text-center text-gray-600 mb-4'
+              style={{ fontFamily: 'HankenGrotesk_400Regular' }}
+            >
+              You've successfully claimed your tokens
+            </Text>
+            
+            <View 
+              className='bg-green-50 rounded-2xl p-4 w-full items-center mb-4'
+            >
+              <Text 
+                className='text-xs text-green-700 mb-1'
+                style={{ fontFamily: 'HankenGrotesk_500Medium' }}
+              >
+                Tokens Earned
+              </Text>
+              <View className='flex-row items-center'>
+                <Text 
+                  className='text-3xl text-green-800'
+                  style={{ fontFamily: 'HankenGrotesk_700Bold' }}
+                >
+                  +{claimedTokens}
+                </Text>
+                <Text 
+                  className='text-2xl text-green-800 ml-2'
+                  style={{ fontFamily: 'HankenGrotesk_700Bold' }}
+                >
+                  KU
+                </Text>
+              </View>
+            </View>
+            
+            <TouchableOpacity 
+              onPress={() => setShowSuccessModal(false)}
+              className='bg-green-600 rounded-xl py-3 px-8 w-full items-center'
+            >
+              <Text 
+                className='text-white text-base'
+                style={{ fontFamily: 'HankenGrotesk_700Bold' }}
+              >
+                Awesome!
+              </Text>
+            </TouchableOpacity>
+          </View>
+        </View>
       </Modal>
     </View>
   )

@@ -38,9 +38,9 @@ const Home = () => {
   const TOKENS_PER_HOUR = TOKENS_PER_SECOND * 3600
 
 
-  const {getNews, isLoading} = useGetNews()
+  const {getNews, isLoading, refetch: refetchNews} = useGetNews()
   const getNewsData = getNews?.data.data
-  const {getProfile, isLoading: profileLoading} = useGetProfile()
+  const {getProfile, isLoading: profileLoading, refetch: refetchProfile} = useGetProfile()
   const profileData = getProfile?.data.data
   console.log('News data', getNewsData)
   console.log('Profile Data data', profileData)
@@ -71,12 +71,18 @@ const Home = () => {
   }, [isMining])
 
 
-  // Pull to refresh function
+  // Pull to refresh function - UPDATED TO REFETCH DATA
   const onRefresh = async () => {
     setRefreshing(true)
     
-    // Simulate data refresh
     try {
+      // Refetch both news and profile data
+      await Promise.all([
+        refetchNews(),
+        refetchProfile()
+      ])
+
+      // Update mining state
       const savedState = await loadMiningState()
       if (savedState && savedState.isMining && savedState.miningStartTime) {
         const currentTime = Date.now()

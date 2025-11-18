@@ -77,3 +77,40 @@ export const useGetTask = () => {
   };
 };
 
+
+export const useGetCompletedTask = () => {
+  const { data, isLoading, isError, isFetched, refetch } = useQuery({
+    queryKey: ["completedTask"],
+    queryFn: async () => {
+      const token = (await AsyncStorage.getItem("ku_token")) || "";
+      return get_requests(`/completed-tasks/`, token);
+    },
+  });
+
+  return {
+    getCompletedTask: data,
+    isLoading,
+    isError,
+    isFetched,
+    refetch,
+  };
+};
+
+
+export const useGetInvitation = () => {
+  const { data, isLoading, isError, isFetched, refetch } = useQuery({
+    queryKey: ["inviteCode"],
+    queryFn: async () => {
+      const token = (await AsyncStorage.getItem("ku_token")) || "";
+      return get_requests(`/users/set-invitation-code/`, token);
+    },
+  });
+
+  return {
+    getInvitationToken: data,
+    isLoading,
+    isError,
+    isFetched,
+    refetch,
+  };
+};

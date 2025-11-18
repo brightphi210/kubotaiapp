@@ -101,7 +101,7 @@ const Login = () => {
 
       <KeyboardAwareScrollView>
         <View className='px-7 mt-10'>
-          <OnboardHeader text='Welcome back!' description="Login to shop, send or track—it's quick and free."/>
+          <OnboardHeader text='Welcome back!' description="Login to farm and earn on KubotAi"/>
           <View className='pt-10'>
 
             <Animated.View className='mb-5' entering={FadeInDown.duration(200).springify()}>
