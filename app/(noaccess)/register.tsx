@@ -70,7 +70,7 @@ const Register = () => {
         },
 
         onError: (error: any) => {
-          console.error('This is was the first error', error.response.data);
+          console.error('This is was the first error', error.response);
           if (error.response?.data?.email) {
             Toast.show(error.response.data.email, {
               type: "danger",

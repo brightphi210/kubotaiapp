@@ -6,27 +6,50 @@ import { useGetCompletedTask, useGetTask } from '@/hooks/queries/allQueries'
 import { Ionicons, MaterialIcons } from '@expo/vector-icons'
 import { StatusBar } from 'expo-status-bar'
 import React, { useEffect, useState } from 'react'
-import { Image, Modal, Pressable, ScrollView, Text, TouchableOpacity, View } from 'react-native'
+import { Image, Modal, Pressable, RefreshControl, ScrollView, Text, TouchableOpacity, View } from 'react-native'
+
+// Define types
+interface Task {
+  id: string | number
+  images: string
+  title: string
+  description: string
+  category: string
+  duration: string
+  reward_tokens: number
+  created_at: string
+}
+
+interface CompletedTask {
+  id: string | number
+  image: string
+  date: string
+  time: string
+  title: string
+  tokens: number
+  category: string
+  created_at: string
+}
+
+type TabType = 'active' | 'completed'
 
 const Tasks = () => {
-
-  const {getTask, isLoading} = useGetTask()
-  const allTask = getTask?.data.data
-  const {getCompletedTask, isLoading: completedtaskLoading} = useGetCompletedTask()
-  const completedTasksFromAPI = getCompletedTask?.data?.data || []
+  const { getTask, isLoading, refetch: refetchTasks } = useGetTask()
+  const allTask: Task[] | undefined = getTask?.data.data
+  const { getCompletedTask, isLoading: completedtaskLoading, refetch: refetchCompletedTasks } = useGetCompletedTask()
+  const completedTasksFromAPI: CompletedTask[] = getCompletedTask?.data?.data || []
   
   console.log('This is Task', allTask)
-  const [activeTab, setActiveTab] = useState<'active' | 'completed'>('active')
-  const [selectedTask, setSelectedTask] = useState<any>(null)
-  const {mutate, isPending} = useClaimToken(selectedTask?.id)
+  const [activeTab, setActiveTab] = useState<TabType>('active')
+  const [selectedTask, setSelectedTask] = useState<Task | null>(null)
+  const { mutate, isPending } = useClaimToken(selectedTask?.id)
   
-  const [showBottomSheet, setShowBottomSheet] = useState(false)
-  const [showSuccessModal, setShowSuccessModal] = useState(false)
-  const [claimedTokens, setClaimedTokens] = useState(0)
-
-  const [completedTasks, setCompletedTasks] = useState([])
-
-  const [taskCompleted, setTaskCompleted] = useState(false)
+  const [showBottomSheet, setShowBottomSheet] = useState<boolean>(false)
+  const [showSuccessModal, setShowSuccessModal] = useState<boolean>(false)
+  const [claimedTokens, setClaimedTokens] = useState<number>(0)
+  const [completedTasks, setCompletedTasks] = useState<CompletedTask[]>([])
+  const [taskCompleted, setTaskCompleted] = useState<boolean>(false)
+  const [refreshing, setRefreshing] = useState<boolean>(false)
 
   // Sync completed tasks from API
   useEffect(() => {
@@ -35,7 +58,22 @@ const Tasks = () => {
     }
   }, [completedTasksFromAPI])
 
-  const handleTaskPress = (task: any) => {
+  // Handle pull to refresh
+  const onRefresh = async () => {
+    setRefreshing(true)
+    try {
+      await Promise.all([
+        refetchTasks(),
+        refetchCompletedTasks()
+      ])
+    } catch (error) {
+      console.error('Error refreshing:', error)
+    } finally {
+      setRefreshing(false)
+    }
+  }
+
+  const handleTaskPress = (task: Task) => {
     setSelectedTask(task)
     setTaskCompleted(false)
     setShowBottomSheet(true)
@@ -49,11 +87,11 @@ const Tasks = () => {
     if (selectedTask) {
       // Call the mutation to claim tokens
       mutate(undefined, {
-        onSuccess: (response) => {
+        onSuccess: (response: any) => {
           console.log('Token claimed successfully:', response)
           
           // Create completed task object
-          const completedTask = {
+          const completedTask: CompletedTask = {
             id: selectedTask.id,
             image: selectedTask.images,
             date: new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
@@ -80,17 +118,16 @@ const Tasks = () => {
             setShowSuccessModal(false)
           }, 3000)
         },
-        onError: (error) => {
+        onError: (error: any) => {
           console.error('Error claiming token:', error)
-          // You can show an error modal here if needed
           alert('Failed to claim tokens. Please try again.')
         }
       })
     }
   }
 
-  const totalTokensAvailable = allTask?.reduce((sum:any, task:any) => sum + task.reward_tokens, 0) || 0
-  const totalTokensEarned = completedTasks.reduce((sum:any, task:any) => sum + (task.tokens || 0), 0)
+  const totalTokensAvailable: number = allTask?.reduce((sum: number, task: Task) => sum + Number(task.reward_tokens), 0) || 0
+  const totalTokensEarned: number = completedTasks.reduce((sum: number, task: CompletedTask) => sum + (task.tokens || 0), 0)
 
   return (
     <View className="flex-1" style={{ backgroundColor: '#F9FAFB' }}>
@@ -201,7 +238,18 @@ const Tasks = () => {
         </TouchableOpacity>
       </View>
 
-      <ScrollView className='px-6 pt-5' showsVerticalScrollIndicator={false}>
+      <ScrollView 
+        className='px-6 pt-5' 
+        showsVerticalScrollIndicator={false}
+        refreshControl={
+          <RefreshControl
+            refreshing={refreshing}
+            onRefresh={onRefresh}
+            tintColor="#016FEC"
+            colors={["#016FEC"]}
+          />
+        }
+      >
         {activeTab === 'active' ? (
           <>
             {allTask === undefined || allTask.length === 0 ? (
@@ -215,7 +263,7 @@ const Tasks = () => {
                 </Text>
               </View>
             ) : (
-              allTask.map((task: any) => (
+              allTask.map((task: Task) => (
                 <TouchableOpacity
                   key={task.id}
                   onPress={() => handleTaskPress(task)}
@@ -307,7 +355,7 @@ const Tasks = () => {
                 </Text>
               </View>
             ) : (
-              completedTasks.map((task, index) => (
+              completedTasks.map((task: CompletedTask, index: number) => (
                 <View 
                   key={task.id}
                   className='bg-white rounded-2xl p-4 mb-4 flex-row items-center'

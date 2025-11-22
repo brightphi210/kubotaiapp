@@ -12,7 +12,7 @@ export const useClaimToken = (id: any) => {
       return post_requests(`/tasks/claim-token/${id}/`, token)
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["task"] })
+      queryClient.invalidateQueries({ queryKey: ["taska"] })
     },
   })
   return claimToken
@@ -20,12 +20,12 @@ export const useClaimToken = (id: any) => {
 
 
 
-export const useInvitationCode = () => {
+export const useSetInvitationCode = () => {
   const queryClient = useQueryClient()
 
   const invitationCode = useMutation({
     mutationFn: async (data: any) => {
-      const token = (await AsyncStorage.getItem("movebay_token")) || ""
+      const token = (await AsyncStorage.getItem("ku_token")) || ""
       return post_requests(`/users/set-invitation-code/`, data, token)
     },
     onSuccess: () => {

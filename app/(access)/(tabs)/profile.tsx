@@ -66,7 +66,7 @@ const Profile = () => {
                   <Image source={{uri: profile.image}} className='w-full h-full object-cover'/>
                 </View>
             }
-            <Text className="text-gray-500 text-base mb-4">{profile.username}</Text>
+            <Text className="text-gray-500 text-base mb-4">@{profile.username}</Text>
             <TouchableOpacity onPress={()=>router.push('/(access)/(stacks)/profileEdit')} className="bg-blue-500 px-6 py-2 rounded-full flex-row items-center gap-2">
               <Text className="text-white font-medium">Edit Profile</Text>
               <MaterialIcons name='edit' color={'white'} size={15}/>
@@ -101,8 +101,6 @@ const Profile = () => {
               <Text className="text-gray-800 font-medium text-base">Invitation code</Text>
             </View>
             <View className="flex-row items-center">
-              <View className="w-2 h-2 bg-red-500 rounded-full mr-2"></View>
-              <Text className="text-gray-500 mr-2">Not Set</Text>
               <Text className="text-gray-400 text-lg">›</Text>
             </View>
           </TouchableOpacity>
