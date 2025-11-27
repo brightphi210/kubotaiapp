@@ -1,8 +1,9 @@
 import { SolidLightButton, SolidMainButton } from '@/components/Btns'
-import { useGetProfile } from '@/hooks/queries/allQueries'
+import { useGetInvitation, useGetProfile } from '@/hooks/queries/allQueries'
 import Ionicons from '@expo/vector-icons/Ionicons'
 import MaterialIcons from '@expo/vector-icons/MaterialIcons'
 import AsyncStorage from '@react-native-async-storage/async-storage'
+import * as Clipboard from 'expo-clipboard'
 import { router } from 'expo-router'
 import { StatusBar } from 'expo-status-bar'
 import React, { useState } from 'react'
@@ -24,9 +25,11 @@ return (
   </View>
 );
 };
+
 const Profile = () => {
 
   const [showDialog, setShowDialog] = useState(false);
+  const [showReferralModal, setShowReferralModal] = useState(false);
   
   const handlePress = () => {
     setShowDialog(true);
@@ -35,16 +38,34 @@ const Profile = () => {
   const closeDialog = () => {
     setShowDialog(false);
   };
+
+  const handleInvitePress = () => {
+    setShowReferralModal(true);
+  };
+
+  const closeReferralModal = () => {
+    setShowReferralModal(false);
+  };
+
+  const handleCopyCode = async () => {
+    if (inviteCode) {
+      await Clipboard.setStringAsync(inviteCode);
+      Toast.show('Referral code copied to clipboard!', { type: 'success' });
+    }
+  };
+
   const handleLogout = async () => {
+    await AsyncStorage.removeItem("ku_token");
+    await AsyncStorage.removeItem("ku_onboarding");
+    router.replace("/login");
+  };
 
-      await AsyncStorage.removeItem("ku_token");
-      await AsyncStorage.removeItem("ku_onboarding");
-      router.replace("/login");
-    };
+  const {isLoading, getProfile} = useGetProfile()
+  const profile = getProfile?.data.data
 
-
-    const {isLoading, getProfile} = useGetProfile()
-    const profile = getProfile?.data.data
+  const { getInvitationToken, isLoading: getInvitationLoading } = useGetInvitation()
+  const inviteCode = getInvitationToken?.data.data?.referral_code
+  console.log('This is invitation code', inviteCode)
 
   return (
     <SafeAreaView className="flex-1 bg-white">
@@ -84,7 +105,7 @@ const Profile = () => {
                         <Text style={{color: '#A53F0E'}} className="text-sm">24/7 Rewards from Every Deal</Text>
                     </View>
                 </View>
-                <TouchableOpacity className="bg-white px-4 py-2 rounded-full">
+                <TouchableOpacity onPress={handleInvitePress} className="bg-white px-4 py-2 rounded-full">
                     <Text className="text-gray-700 text-sm font-medium">invite</Text>
                 </TouchableOpacity>
             </View>
@@ -103,6 +124,17 @@ const Profile = () => {
             <View className="flex-row items-center">
               <Text className="text-gray-400 text-lg">›</Text>
             </View>
+          </TouchableOpacity>
+
+          {/* Earning Team */}
+          <TouchableOpacity onPress={()=>router.push('/(access)/(stacks)/task')} className="flex-row items-center justify-between py-4 px-4 bg-gray-50 rounded-xl mb-2">
+            <View className="flex-row items-center">
+              <View className="w-10 h-10 bg-gray-200 rounded-lg items-center justify-center mr-3">
+                <MaterialIcons name='task' size={20} color={'gray'}/>
+              </View>
+              <Text className="text-gray-800 font-medium text-base">Available Task</Text>
+            </View>
+            <Text className="text-gray-400 text-lg">›</Text>
           </TouchableOpacity>
 
           {/* Earning Team */}
@@ -160,8 +192,6 @@ const Profile = () => {
             <Text className="text-gray-400 text-lg">›</Text>
           </TouchableOpacity>
 
-
-
           {/* Feedback */}
           <TouchableOpacity className="flex-row items-center justify-between py-4 px-4 bg-gray-50 rounded-xl mb-2">
             <View className="flex-row items-center">
@@ -187,6 +217,7 @@ const Profile = () => {
         <View className="h-14"></View>
       </ScrollView>
 
+      {/* Logout Modal */}
       <CustomModal visible={showDialog} onClose={closeDialog}>
           <View className='bg-white rounded-2xl p-8 mx-6 w-[90%]'>
             <View className='items-center justify-center m-auto rounded-full p-5 bg-neutral-100 w-fit mb-5'>
@@ -206,6 +237,49 @@ const Profile = () => {
 
               <View className='w-[49%]'>
                 <SolidMainButton onPress={handleLogout} text='Logout'/>
+              </View>
+            </View>
+          </View>
+        </CustomModal>
+
+      {/* Referral Code Modal */}
+      <CustomModal visible={showReferralModal} onClose={closeReferralModal}>
+          <View className='bg-white rounded-2xl p-8 mx-6 w-[90%]'>
+            <View className='items-center justify-center m-auto rounded-full p-5 bg-orange-100 w-fit mb-5'>
+              <Text style={{fontSize: 40}}>🎁</Text>
+            </View>
+            <Text className='text-xl text-center mb-2' style={{fontFamily: 'HankenGrotesk_600SemiBold'}}>
+              Your Referral Code
+            </Text>
+            <Text className='text-neutral-500 text-center mb-6 text-sm' style={{fontFamily: 'HankenGrotesk_500Medium'}}>
+              Share this code with friends and earn rewards from every deal!
+            </Text>
+
+            {getInvitationLoading ? (
+              <View className='py-4'>
+                <ActivityIndicator size={'small'} color={'#016FEC'}/>
+              </View>
+            ) : (
+              <View className='bg-gray-100 rounded-xl p-4 mb-6'>
+                <Text className='text-center text-2xl font-bold tracking-wider' style={{fontFamily: 'HankenGrotesk_700Bold'}}>
+                  {inviteCode || 'N/A'}
+                </Text>
+              </View>
+            )}
+
+            <View className='flex-row items-center justify-between gap-2'>
+              <View className='flex-1'>
+                <SolidLightButton onPress={closeReferralModal} text='Close'/>
+              </View>
+
+              <View className='flex-1'>
+                <TouchableOpacity 
+                  onPress={handleCopyCode}
+                  className='flex-row justify-center items-center gap-2 bg-[#016FEC] p-4 w-full rounded-lg'
+                >
+                  <Ionicons name='copy-outline' size={15} color={'white'}/>
+                  <Text className='text-white font-semibold text-[13px]'>Copy Code</Text>
+                </TouchableOpacity>
               </View>
             </View>
           </View>

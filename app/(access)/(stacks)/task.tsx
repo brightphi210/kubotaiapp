@@ -5,8 +5,8 @@ import { useClaimToken } from '@/hooks/mutation/allMutation'
 import { useGetCompletedTask, useGetTask } from '@/hooks/queries/allQueries'
 import { Ionicons, MaterialIcons } from '@expo/vector-icons'
 import { StatusBar } from 'expo-status-bar'
-import React, { useEffect, useState } from 'react'
-import { Image, Modal, Pressable, RefreshControl, ScrollView, Text, TouchableOpacity, View } from 'react-native'
+import React, { useEffect, useRef, useState } from 'react'
+import { Animated, Easing, Image, Modal, Pressable, RefreshControl, ScrollView, Text, TouchableOpacity, View } from 'react-native'
 
 // Define types
 interface Task {
@@ -26,12 +26,125 @@ interface CompletedTask {
   date: string
   time: string
   title: string
-  tokens: number
+  reward_tokens: string
   category: string
   created_at: string
+  description: string
 }
 
 type TabType = 'active' | 'completed'
+
+// Bubble Component
+const Bubble = ({ delay, duration, startX, endX, endY, emoji }: any) => {
+  const translateY = useRef(new Animated.Value(0)).current
+  const translateX = useRef(new Animated.Value(0)).current
+  const opacity = useRef(new Animated.Value(0)).current
+  const scale = useRef(new Animated.Value(0)).current
+
+  useEffect(() => {
+    Animated.sequence([
+      Animated.delay(delay),
+      Animated.parallel([
+        Animated.timing(translateY, {
+          toValue: endY,
+          duration: duration,
+          easing: Easing.out(Easing.cubic),
+          useNativeDriver: true,
+        }),
+        Animated.timing(translateX, {
+          toValue: endX - startX,
+          duration: duration,
+          easing: Easing.inOut(Easing.ease),
+          useNativeDriver: true,
+        }),
+        Animated.timing(opacity, {
+          toValue: 1,
+          duration: duration * 0.2,
+          useNativeDriver: true,
+        }),
+        Animated.sequence([
+          Animated.timing(scale, {
+            toValue: 1.2,
+            duration: duration * 0.3,
+            easing: Easing.out(Easing.back(2)),
+            useNativeDriver: true,
+          }),
+          Animated.timing(scale, {
+            toValue: 0,
+            duration: duration * 0.3,
+            delay: duration * 0.4,
+            useNativeDriver: true,
+          }),
+        ]),
+      ]),
+    ]).start()
+  }, [])
+
+  return (
+    <Animated.Text
+      style={[
+        {
+          position: 'absolute',
+          fontSize: 32,
+          top: 0,
+          left: startX,
+        },
+        {
+          transform: [
+            { translateY },
+            { translateX },
+            { scale },
+          ],
+          opacity,
+        },
+      ]}
+    >
+      {emoji}
+    </Animated.Text>
+  )
+}
+
+// BubbleSplash Component
+const BubbleSplash = ({ visible }: { visible: boolean }) => {
+  const bubbles = [
+    { emoji: '🎉', startX: 50, endX: 20, endY: -200, delay: 0, duration: 1500 },
+    { emoji: '✨', startX: 150, endX: 180, endY: -250, delay: 100, duration: 1600 },
+    { emoji: '🪙', startX: 100, endX: 80, endY: -180, delay: 50, duration: 1400 },
+    { emoji: '💫', startX: 200, endX: 240, endY: -220, delay: 150, duration: 1700 },
+    { emoji: '⭐', startX: 120, endX: 140, endY: -190, delay: 80, duration: 1500 },
+    { emoji: '🎊', startX: 180, endX: 160, endY: -240, delay: 120, duration: 1550 },
+    { emoji: '💰', startX: 80, endX: 50, endY: -210, delay: 60, duration: 1450 },
+    { emoji: '✨', startX: 220, endX: 260, endY: -200, delay: 140, duration: 1650 },
+  ]
+
+  if (!visible) return null
+
+  return (
+    <View 
+      style={{ 
+        position: 'absolute',
+        top: '50%',
+        left: 0,
+        right: 0,
+        height: 300,
+        zIndex: 9999,
+      }} 
+      pointerEvents="none"
+    >
+      {bubbles.map((bubble, index) => (
+        <Bubble
+          key={index}
+          emoji={bubble.emoji}
+          startX={bubble.startX}
+          endX={bubble.endX}
+          endY={bubble.endY}
+          delay={bubble.delay}
+          duration={bubble.duration}
+        />
+      ))}
+    </View>
+  )
+}
 
 const Tasks = () => {
   const { getTask, isLoading, refetch: refetchTasks } = useGetTask()
@@ -39,13 +152,14 @@ const Tasks = () => {
   const { getCompletedTask, isLoading: completedtaskLoading, refetch: refetchCompletedTasks } = useGetCompletedTask()
   const completedTasksFromAPI: CompletedTask[] = getCompletedTask?.data?.data || []
   
-  console.log('This is Task', allTask)
+  console.log('This is Task', allTask, completedTasksFromAPI)
   const [activeTab, setActiveTab] = useState<TabType>('active')
   const [selectedTask, setSelectedTask] = useState<Task | null>(null)
   const { mutate, isPending } = useClaimToken(selectedTask?.id)
   
   const [showBottomSheet, setShowBottomSheet] = useState<boolean>(false)
   const [showSuccessModal, setShowSuccessModal] = useState<boolean>(false)
+  const [showBubbles, setShowBubbles] = useState<boolean>(false)
   const [claimedTokens, setClaimedTokens] = useState<number>(0)
   const [completedTasks, setCompletedTasks] = useState<CompletedTask[]>([])
   const [taskCompleted, setTaskCompleted] = useState<boolean>(false)
@@ -57,6 +171,14 @@ const Tasks = () => {
       setCompletedTasks(completedTasksFromAPI)
     }
   }, [completedTasksFromAPI])
+
+  // Auto-hide success modal and bubbles after 3 seconds
+  useEffect(() => {
+    if (showSuccessModal) {
+        setShowSuccessModal(false)
+        setShowBubbles(false)
+    }
+  }, [showSuccessModal])
 
   // Handle pull to refresh
   const onRefresh = async () => {
@@ -85,38 +207,15 @@ const Tasks = () => {
 
   const handleClaimTokens = () => {
     if (selectedTask) {
-      // Call the mutation to claim tokens
       mutate(undefined, {
         onSuccess: (response: any) => {
           console.log('Token claimed successfully:', response)
-          
-          // Create completed task object
-          const completedTask: CompletedTask = {
-            id: selectedTask.id,
-            image: selectedTask.images,
-            date: new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
-            time: new Date().toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' }),
-            title: selectedTask.title,
-            tokens: selectedTask.reward_tokens,
-            category: selectedTask.category,
-            created_at: selectedTask.created_at
-          }
-          
-          // Update completed tasks
-          setCompletedTasks([completedTask, ...completedTasks])
-          
-          // Store claimed tokens for success modal
           setClaimedTokens(selectedTask.reward_tokens)
-          
-          // Close bottom sheet and show success modal
           setShowBottomSheet(false)
           setShowSuccessModal(true)
+          setShowBubbles(true)
           setSelectedTask(null)
-          
-          // Auto close success modal after 3 seconds
-          setTimeout(() => {
-            setShowSuccessModal(false)
-          }, 3000)
+          refetchCompletedTasks()
         },
         onError: (error: any) => {
           console.error('Error claiming token:', error)
@@ -127,7 +226,7 @@ const Tasks = () => {
   }
 
   const totalTokensAvailable: number = allTask?.reduce((sum: number, task: Task) => sum + Number(task.reward_tokens), 0) || 0
-  const totalTokensEarned: number = completedTasks.reduce((sum: number, task: CompletedTask) => sum + (task.tokens || 0), 0)
+  const totalTokensEarned: number = completedTasks.reduce((sum: number, task: CompletedTask) => sum + Number(task.reward_tokens || 0), 0)
 
   return (
     <View className="flex-1" style={{ backgroundColor: '#F9FAFB' }}>
@@ -324,7 +423,7 @@ const Tasks = () => {
                         <Text style={{ fontSize: 14, marginRight: 6 }}>🪙</Text>
                         <View>
                           <Text className='text-base text-green-800' style={{ fontFamily: 'HankenGrotesk_600SemiBold' }}>
-                            +{task.reward_tokens} KU
+                            +{Number(task.reward_tokens)} KU
                           </Text>
                         </View>
                       </View>
@@ -356,62 +455,122 @@ const Tasks = () => {
               </View>
             ) : (
               completedTasks.map((task: CompletedTask, index: number) => (
-                <View 
-                  key={task.id}
-                  className='bg-white rounded-2xl p-4 mb-4 flex-row items-center'
-                  style={{ 
-                    shadowColor: '#000',
-                    shadowOffset: { width: 0, height: 2 },
-                    shadowOpacity: 0.06,
-                    shadowRadius: 8,
-                    elevation: 2,
-                    borderWidth: 1,
-                    borderColor: '#F3F4F6'
-                  }}
-                >
-                  <View className='relative'>
-                    <Image 
-                      source={{ uri: task.image }}
-                      style={{ width: 56, height: 56, borderRadius: 12, backgroundColor: '#E5E7EB' }}
-                    />
-                    <View 
-                      className='absolute -bottom-1 -right-1 w-6 h-6 rounded-full items-center justify-center'
-                      style={{ backgroundColor: '#10B981' }}
-                    >
-                      <Text style={{ color: '#FFFFFF', fontSize: 14 }}>✓</Text>
-                    </View>
-                  </View>
+                 <View 
+                    className='bg-white rounded-lg p-4 mb-4 border border-gray-100'
+                    key={index}
+                  >
+                    <View className='flex-row items-start mb-3'>
+                      <View style={{ position: 'relative' }}>
+                        <Image 
+                          source={{ uri: task.image }}
+                          style={{ 
+                            width: 60, 
+                            height: 60, 
+                            borderRadius: 8, 
+                            backgroundColor: '#E5E7EB'
+                          }}
+                        />
+                      </View>
 
-                  <View className='flex-1 ml-3'>
-                    <Text className='text-base mb-0.5' style={{ fontFamily: 'HankenGrotesk_700Bold', color: '#111827' }} numberOfLines={1}>
-                      {task.title}
-                    </Text>
-                    <Text className='text-xs text-gray-400 mb-1' style={{ fontFamily: 'HankenGrotesk_500Medium' }}>
-                      {task.date} • {task.time}
-                    </Text>
-                    <View className='flex-row items-center'>
-                      <View className='px-2 py-0.5 rounded bg-green-50'>
-                        <Text style={{ fontFamily: 'HankenGrotesk_600SemiBold', color: '#10B981', fontSize: 10 }}>
-                          CLAIMED
+                      <View className='flex-1 ml-3'>
+                        <View className='flex-row items-center justify-between mb-1'>
+                          <View className='px-2 py-0.5 rounded bg-blue-50 mr-2'>
+                            <Text style={{ 
+                              fontFamily: 'HankenGrotesk_600SemiBold', 
+                              color: '#3B82F6', 
+                              fontSize: 10 
+                            }}>
+                              {task.category}
+                            </Text>
+                          </View>
+                        </View>
+                        <Text className='text-base' style={{ fontFamily: 'HankenGrotesk_700Bold', color: '#111827' }}>
+                          {task.title}
                         </Text>
+                        <Text className='text-sm text-gray-500' style={{ fontFamily: 'HankenGrotesk_400Regular' }} numberOfLines={2}>
+                          {task.description.slice(0, 40)}...
+                        </Text>
+                      </View>
+
+                      <Text className='ml-auto text-xs absolute right-0 text-gray-500' style={{fontFamily: 'HankenGrotesk_400Regular'}}>
+                        {new Date(task.created_at).toLocaleDateString('en-US', {
+                          year: 'numeric',
+                          month: 'short',
+                          day: 'numeric'
+                        })}
+                     </Text>
+                    </View>
+
+                    <View 
+                      className='flex-row items-center justify-between rounded-xl border-t border-gray-100 pt-2'
+                    >
+                      <View className='flex-row items-center'>
+                        <Text style={{ fontSize: 14, marginRight: 6 }}>🪙</Text>
+                        <View>
+                          <Text className='text-base text-green-800' style={{ fontFamily: 'HankenGrotesk_600SemiBold' }}>
+                            +{Number(task.reward_tokens)} KU
+                          </Text>
+                        </View>
                       </View>
                     </View>
                   </View>
+                // <View 
+                //   key={task.id}
+                //   className='bg-white rounded-2xl p-4 mb-4 flex-row items-center'
+                //   style={{ 
+                //     shadowColor: '#000',
+                //     shadowOffset: { width: 0, height: 2 },
+                //     shadowOpacity: 0.06,
+                //     shadowRadius: 8,
+                //     elevation: 2,
+                //     borderWidth: 1,
+                //     borderColor: '#F3F4F6'
+                //   }}
+                // >
+                //   <View className='relative'>
+                //     <Image 
+                //       source={{ uri: task?.images }}
+                //       style={{ width: 56, height: 56, borderRadius: 12, backgroundColor: '#E5E7EB' }}
+                //     />
+                //     <View 
+                //       className='absolute -bottom-1 -right-1 w-6 h-6 rounded-full items-center justify-center'
+                //       style={{ backgroundColor: '#10B981' }}
+                //     >
+                //       <Text style={{ color: '#FFFFFF', fontSize: 14 }}>✓</Text>
+                //     </View>
+                //   </View>
 
-                  <View className='items-end'>
-                    <View 
-                      className='px-3 py-1.5 rounded-lg'
-                      style={{ backgroundColor: '#DCFCE7' }}
-                    >
-                      <Text className='text-base' style={{ fontFamily: 'HankenGrotesk_700Bold', color: '#16A34A' }}>
-                        +{task.tokens}
-                      </Text>
-                      <Text className='text-xs' style={{ fontFamily: 'HankenGrotesk_600SemiBold', color: '#16A34A' }}>
-                        KU
-                      </Text>
-                    </View>
-                  </View>
-                </View>
+                //   <View className='flex-1 ml-3'>
+                //     <Text className='text-base mb-0.5' style={{ fontFamily: 'HankenGrotesk_700Bold', color: '#111827' }} numberOfLines={1}>
+                //       {task.title}
+                //     </Text>
+                //     <Text className='text-xs text-gray-400 mb-1' style={{ fontFamily: 'HankenGrotesk_500Medium' }}>
+                //       {new Date(task.created_at).toLocaleDateString('en-US', {
+                //           year: 'numeric',
+                //           month: 'short',
+                //           day: 'numeric'
+                //         })}
+                //     </Text>
+                //     <View className='flex-row items-center'>
+                //       <View className='px-2 py-0.5 rounded bg-green-50'>
+                //         <Text style={{ fontFamily: 'HankenGrotesk_600SemiBold', color: '#10B981', fontSize: 10 }}>
+                //           CLAIMED
+                //         </Text>
+                //       </View>
+                //     </View>
+                //   </View>
+
+                //   <View className='items-end'>
+                //     <View 
+                //       className='px-3 py-1.5 rounded-lg flex-row'
+                //       style={{ backgroundColor: '#DCFCE7' }}
+                //     >
+                //       <Text className='text-base' style={{ fontFamily: 'HankenGrotesk_700Bold', color: '#16A34A' }}>
+                //         +{Number(task.reward_tokens)} KU
+                //       </Text>
+                //     </View>
+                //   </View>
+                // </View>
               ))
             )}
           </>
@@ -419,7 +578,6 @@ const Tasks = () => {
 
         <View style={{ height: 20 }} />
       </ScrollView>
-
 
       {/* Enhanced Bottom Sheet Modal */}
       <Modal
@@ -517,7 +675,7 @@ const Tasks = () => {
                         style={{ opacity: isPending ? 0.6 : 1 }}
                       >
                         <Text className='text-white text-[13px]' style={{ fontFamily: 'HankenGrotesk_700Bold'}}>
-                          {isPending ? 'Claiming...' : `🪙 Claim ${selectedTask.reward_tokens} KU Tokens`}
+                          {isPending ? 'Claiming...' : `🪙 Claim ${Number(selectedTask.reward_tokens)} KU Tokens`}
                         </Text>
                       </TouchableOpacity>
                     </>
@@ -529,7 +687,7 @@ const Tasks = () => {
         </Pressable>
       </Modal>
 
-      {/* Success Modal */}
+      {/* Success Modal with Bubble Splash */}
       <Modal
         visible={showSuccessModal}
         transparent={true}
@@ -539,15 +697,19 @@ const Tasks = () => {
           className='flex-1 justify-center items-center'
           style={{ backgroundColor: 'rgba(0, 0, 0, 0.7)' }}
         >
+          {/* Bubble Splash Animation */}
+          <BubbleSplash visible={showBubbles} />
+
+
           <View 
-            className='bg-white rounded-3xl p-8 mx-8 items-center'
+            className='bg-white rounded-2xl p-8 mx-4 items-center'
             style={{ 
               shadowColor: '#000',
               shadowOffset: { width: 0, height: 10 },
               shadowOpacity: 0.3,
               shadowRadius: 20,
               elevation: 10,
-              maxWidth: 350,
+              maxWidth: '90%',
               width: '100%'
             }}
           >
@@ -586,7 +748,7 @@ const Tasks = () => {
                   className='text-3xl text-green-800'
                   style={{ fontFamily: 'HankenGrotesk_700Bold' }}
                 >
-                  +{claimedTokens}
+                  +{Number(claimedTokens)}
                 </Text>
                 <Text 
                   className='text-2xl text-green-800 ml-2'
@@ -596,18 +758,14 @@ const Tasks = () => {
                 </Text>
               </View>
             </View>
-            
-            <TouchableOpacity 
-              onPress={() => setShowSuccessModal(false)}
-              className='bg-green-600 rounded-xl py-3 px-8 w-full items-center'
-            >
-              <Text 
-                className='text-white text-base'
-                style={{ fontFamily: 'HankenGrotesk_700Bold' }}
-              >
-                Awesome!
-              </Text>
-            </TouchableOpacity>
+
+            <SolidMainButton 
+              onPress={() => {
+                setShowSuccessModal(false)
+                setShowBubbles(false)
+              }}
+              text='Awesome!'
+            />
           </View>
         </View>
       </Modal>

@@ -5,7 +5,7 @@ import { useSetInvitationCode } from '@/hooks/mutation/allMutation'
 import { useGetInvitation } from '@/hooks/queries/allQueries'
 import { Ionicons } from '@expo/vector-icons'
 import { ErrorMessage } from '@hookform/error-message'
-// import * as Clipboard from 'expo-clipboard'
+import * as Clipboard from 'expo-clipboard'
 import { StatusBar } from 'expo-status-bar'
 import React, { useState } from 'react'
 import { Controller, useForm } from 'react-hook-form'
@@ -49,7 +49,7 @@ const SetUsername = () => {
 
   const handleCopy = async () => {
     if (inviteCode) {
-      // await Clipboard.setStringAsync(inviteCode)
+      await Clipboard.setStringAsync(inviteCode)
       toast.show('Invite code copied!', { type: 'success' })
     }
   }

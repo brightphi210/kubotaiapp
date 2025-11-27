@@ -83,7 +83,7 @@ export const useGetCompletedTask = () => {
     queryKey: ["completedTask"],
     queryFn: async () => {
       const token = (await AsyncStorage.getItem("ku_token")) || "";
-      return get_requests(`/completed-tasks/`, token);
+      return get_requests(`/tasks/completed-task/`, token);
     },
   });
 
