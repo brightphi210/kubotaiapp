@@ -114,3 +114,84 @@ export const useGetInvitation = () => {
     refetch,
   };
 };
+
+export const useGetRegionalTokens = () => {
+  const { data, isLoading, isError, isFetched, refetch } = useQuery({
+    queryKey: ["regionalTokens"],
+    queryFn: async () => {
+      const token = (await AsyncStorage.getItem("ku_token")) || "";
+      return get_requests(`/tokens/regional/`, token);
+    },
+  });
+
+  return {
+    getRegionalLeader: data,
+    isLoading,
+    isError,
+    isFetched,
+    refetch,
+  };
+};
+
+export const useGetGlobalTokens = () => {
+  const { data, isLoading, isError, isFetched, refetch } = useQuery({
+    queryKey: ["globalTokens"],
+    queryFn: async () => {
+      const token = (await AsyncStorage.getItem("ku_token")) || "";
+      return get_requests(`/tokens/global/`, token);
+    },
+  });
+
+  return {
+    getGlobalLeader: data,
+    isLoading,
+    isError,
+    isFetched,
+    refetch,
+  };
+}
+
+
+export const useGetSingleNews = (id:any) => {
+  const { data, isLoading, isError, isFetched, refetch } = useQuery({
+    queryKey: ["singleNews"],
+    queryFn: async () => {
+      const token = (await AsyncStorage.getItem("ku_token")) || "";
+      return get_requests(`/news/${id}/`, token);
+    },
+  });
+
+  return {
+    getSingleNews: data,
+    isLoading,
+    isError,
+    isFetched,
+    refetch,
+  };
+}
+
+
+export const useGetSingleNewsComment = (id:any) => {
+  const { data, isLoading, isError, isFetched, refetch } = useQuery({
+    queryKey: ["commenta"],
+    queryFn: async () => {
+      const token = (await AsyncStorage.getItem("ku_token")) || "";
+      return get_requests(`/news/comment/${id}/`, token);
+    },
+  });
+
+  return {
+    getSingleNewsComment: data,
+    isLoading,
+    isError,
+    isFetched,
+    refetch,
+  };
+}
+
+
+
+
+
+
+

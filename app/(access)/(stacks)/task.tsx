@@ -152,7 +152,7 @@ const Tasks = () => {
   const { getCompletedTask, isLoading: completedtaskLoading, refetch: refetchCompletedTasks } = useGetCompletedTask()
   const completedTasksFromAPI: CompletedTask[] = getCompletedTask?.data?.data || []
   
-  console.log('This is Task', allTask, completedTasksFromAPI)
+  console.log('This is Task', allTask)
   const [activeTab, setActiveTab] = useState<TabType>('active')
   const [selectedTask, setSelectedTask] = useState<Task | null>(null)
   const { mutate, isPending } = useClaimToken(selectedTask?.id)
@@ -374,7 +374,7 @@ const Tasks = () => {
                     <View className='flex-row items-start mb-3'>
                       <View style={{ position: 'relative' }}>
                         <Image 
-                          source={{ uri: task.images }}
+                          source={{ uri: task.image }}
                           style={{ 
                             width: 60, 
                             height: 60, 

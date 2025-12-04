@@ -13,32 +13,48 @@ const WhitePaper = () => {
       <ScrollView className='px-6 pt-4'>
         <View>
             <Text className='text-2xl text-center font-extrabold' style={{fontFamily: 'HankenGrotesk_600SemiBold'}}>WHITE PAPER</Text>
-            <Text className='text-lg pt-4 font-extrabold' style={{fontFamily: 'HankenGrotesk_500Medium'}}>KUBOT Token</Text>
-            <Text className='text-base text-gray-500 ' style={{fontFamily: 'HankenGrotesk_400Regular'}}>Reimagining Value Exchange in the Digital Economy</Text>
+            <Text className='text-lg pt-4 font-extrabold text-center' style={{fontFamily: 'HankenGrotesk_500Medium'}}>KUBOT AI / KU NETWORK </Text>
+            <Text className='text-base text-gray-500 text-center' style={{fontFamily: 'HankenGrotesk_400Regular'}}>Version 1.0 | October 2025</Text>
         </View>
+
         <View className='pt-8'>
-            <Text className='text-base' style={{fontFamily: 'HankenGrotesk_600SemiBold'}}>Introduction</Text>
+            <Text className='text-base' style={{fontFamily: 'HankenGrotesk_600SemiBold'}}>Abstract</Text>
             <Text className='text-sm text-gray-500 font-normal leading-loose' style={{fontFamily: 'HankenGrotesk_400Regular'}}>
-                In a world rapidly moving toward decentralization, 
-                AURA Token emerges as a community-driven digital asset designed to 
-                empower users, businesses, and creators. The token aims to serve as a 
-                bridge between real-world value and decentralized finance (DeFi), offering 
-                a seamless ecosystem for payments, rewards, staking, and governance.
+                Kubot AI, operating through the KU Network, is a 
+                next-generation Web3 ecosystem built to democratize crypto mining, 
+                digital utility, and AI automation across the globe. Our mission is 
+                to create an intelligent, accessible, and community-driven cryptocurrency 
+                project that allows users to mine tokens effortlessly using mobile and Web2 
+                applications—while integrating Web3 wallets for seamless blockchain interaction. 
+                Rewards scale with user participation and contribution. KU Network bridges artificial 
+                intelligence and blockchain, promoting inclusive adoption, transparent governance, 
+                and value-backed digital currency.
+            </Text>
+        </View>
+
+        <View className='pt-8'>
+            <Text className='text-base' style={{fontFamily: 'HankenGrotesk_600SemiBold'}}>Introduction & Vission</Text>
+            <Text className='text-sm text-gray-500 font-normal leading-loose' style={{fontFamily: 'HankenGrotesk_400Regular'}}>
+                The world is rapidly transitioning toward decentralized economies powered by AI and blockchain. Yet, accessibility remains the biggest challenge. KU Network (symbol: KU) simplifies entry into the crypto economy for everyone—especially emerging markets—through AI-assisted mining, user education, and community engagement.
+                {'\n'}
+                {'\n'}
+                Our unique value proposition: combining AI-driven mining optimization, fair reward distribution, and real-world utility adoption. We also focus on sustainable, energy-efficient mining practices.
             </Text>
         </View>
 
         <View className='pt-4'>
-            <Text className='text-base' style={{fontFamily: 'HankenGrotesk_600SemiBold'}}>Vision & Mission</Text>
+            <Text className='text-base' style={{fontFamily: 'HankenGrotesk_600SemiBold'}}>Problem Statement</Text>
             <Text className='text-sm text-gray-500 font-normal leading-loose' style={{fontFamily: 'HankenGrotesk_400Regular'}}>
-                Vision:
-                To create a decentralized ecosystem that promotes transparency, 
-                inclusivity, and financial empowerment for everyone.
+                Despite blockchain growth, key challenges persist:
             </Text>
 
             <Text className='text-sm text-gray-500 font-normal leading-loose' style={{fontFamily: 'HankenGrotesk_400Regular'}}>
-                Vision:
-                To create a decentralized ecosystem that promotes transparency, 
-                inclusivity, and financial empowerment for everyone.
+                • Complex mining setups exclude everyday users. {'\n'}
+                • Lack of transparency erodes public trust.{'\n'}
+                • Many projects focus on hype rather than utility.{'\n'}
+                • Few projects connect real-world adoption to mining rewards.{'\n'}
+                • Regulatory uncertainty and jurisdictional legal risks remain unaddressed in most projects.
+
             </Text>
         </View>
 

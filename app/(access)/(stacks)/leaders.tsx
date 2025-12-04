@@ -1,59 +1,9 @@
 import Header from '@/components/Header'
+import { useGetGlobalTokens, useGetRegionalTokens } from '@/hooks/queries/allQueries'
 import MaterialIcons from '@expo/vector-icons/MaterialIcons'
 import { StatusBar } from 'expo-status-bar'
 import React, { useState } from 'react'
-import { Image, ScrollView, Text, TouchableOpacity, View } from 'react-native'
-
-const leaderData = [
-  { 
-    id: 1, 
-    name: 'Bright', 
-    reward: 500000, 
-    avatar: null
-  },
-  { 
-    id: 2, 
-    name: 'Grace Ige', 
-    reward: 450000, 
-    avatar: null
-  },
-  { 
-    id: 3, 
-    name: 'Simon Opuene', 
-    reward: 400000, 
-    avatar: null
-  },
-  { 
-    id: 4, 
-    name: 'Paul Tukur', 
-    reward: 350000, 
-    avatar: null
-  },
-  { 
-    id: 5, 
-    name: 'Joshua Durojaiye', 
-    reward: 300000, 
-    avatar: null
-  },
-  { 
-    id: 6, 
-    name: 'Timothy Anozie', 
-    reward: 250000, 
-    avatar: null
-  },
-  { 
-    id: 7, 
-    name: 'Collins Adebayo', 
-    reward: 200000, 
-    avatar: null
-  },
-  { 
-    id: 8, 
-    name: 'Michael Johnson', 
-    reward: 150000, 
-    avatar: null
-  },
-]
+import { ActivityIndicator, Image, ScrollView, Text, TouchableOpacity, View } from 'react-native'
 
 const getRankColor = (rank: any) => {
   switch(rank) {
@@ -64,11 +14,9 @@ const getRankColor = (rank: any) => {
   }
 }
 
-const formatNumber = (num: any) => {
-  return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
-}
 
 const getInitials = (name: any) => {
+  if (!name) return '?'
   return name.split(' ').map((word: any) => word[0]).join('').toUpperCase()
 }
 
@@ -93,9 +41,9 @@ const RankingItem = ({ leader, index }: any) => {
 
       {/* Avatar */}
       <View className="mr-3">
-        {leader.avatar ? (
+        {leader?.owner?.profile?.image ? (
           <Image 
-            source={{ uri: leader.avatar }} 
+            source={{ uri: leader?.owner?.profile?.image }} 
             className="w-12 h-12 rounded-full" 
           />
         ) : (
@@ -107,7 +55,7 @@ const RankingItem = ({ leader, index }: any) => {
               className="text-lg font-semibold text-gray-600"
               style={{ fontFamily: 'HankenGrotesk_700Bold' }}
             >
-              {getInitials(leader.name)}
+              {getInitials(leader?.owner?.username)}
             </Text>
           </View>
         )}
@@ -126,7 +74,7 @@ const RankingItem = ({ leader, index }: any) => {
           className="text-base font-semibold text-gray-900"
           style={{ fontFamily: 'HankenGrotesk_600SemiBold' }}
         >
-          {leader.name}
+          {leader?.owner?.username}
         </Text>
       </View>
 
@@ -136,7 +84,7 @@ const RankingItem = ({ leader, index }: any) => {
           className="text-base font-bold text-gray-900"
           style={{ fontFamily: 'HankenGrotesk_700Bold' }}
         >
-          {formatNumber(leader.reward)}.{(Math.random() * 9999).toFixed(0).padStart(4, '0')}
+          {leader?.quantity && leader?.quantity.toLocaleString() || '0.00'} KU
         </Text>
       </View>
     </View>
@@ -144,41 +92,29 @@ const RankingItem = ({ leader, index }: any) => {
 }
 
 const Leaders = () => {
-  const [activeTab, setActiveTab] = useState('KU')
   const [selectedView, setSelectedView] = useState('Regional')
-  const sortedLeaderData = [...leaderData].sort((a, b) => b.reward - a.reward)
+
+  const {getRegionalLeader, isLoading: regionalLoading} = useGetRegionalTokens()
+  const regionalLeader = getRegionalLeader?.data?.results || []
+
+  const {getGlobalLeader, isLoading: globalLoading} = useGetGlobalTokens()
+  const globalLeader = getGlobalLeader?.data?.results || []
+
+  // Sort the data by quantity (reward) in descending order
+  const sortedRegionalData = [...regionalLeader].sort((a, b) => (b.quantity || 0) - (a.quantity || 0))
+  const sortedGlobalData = [...globalLeader].sort((a, b) => (b.quantity || 0) - (a.quantity || 0))
+
+  // Select which data to display based on the active view
+  const displayData = selectedView === 'Regional' ? sortedRegionalData : sortedGlobalData
+  const isLoading = selectedView === 'Regional' ? regionalLoading : globalLoading
+
+  console.log('Regional Leaders:', regionalLeader);
+  console.log('Global Leaders:', globalLeader);
 
   return (
     <View className="flex-1" style={{ backgroundColor: '#F9FAFB' }}>
       <StatusBar style='light'/> 
       <Header text='Ranking'/>
-
-      {/* Tab Buttons */}
-      <View className="flex-row mx-4 mt-4 mb-6">
-        <TouchableOpacity
-          onPress={() => setActiveTab('KU')}
-          className={`flex-1 py-3 rounded-l-xl ${activeTab === 'KU' ? 'bg-gray-800' : 'bg-gray-200'}`}
-        >
-          <Text 
-            className={`text-center font-semibold ${activeTab === 'KU' ? 'text-white' : 'text-gray-600'}`}
-            style={{ fontFamily: 'HankenGrotesk_600SemiBold' }}
-          >
-            KU
-          </Text>
-        </TouchableOpacity>
-        
-        <TouchableOpacity
-          onPress={() => setActiveTab('Users')}
-          className={`flex-1 py-3 rounded-r-xl ${activeTab === 'Users' ? 'bg-gray-800' : 'bg-gray-200'}`}
-        >
-          <Text 
-            className={`text-center font-semibold ${activeTab === 'Users' ? 'text-white' : 'text-gray-600'}`}
-            style={{ fontFamily: 'HankenGrotesk_600SemiBold' }}
-          >
-            Users by region
-          </Text>
-        </TouchableOpacity>
-      </View>
 
       {/* Regional/Global Toggle */}
       <View className="flex-row mx-4 mb-4">
@@ -218,14 +154,32 @@ const Leaders = () => {
         </TouchableOpacity>
       </View>
 
-      {/* Leaderboard List */}
-      <ScrollView className="flex-1" showsVerticalScrollIndicator={false}>
-        <View className="pb-6">
-          {sortedLeaderData.map((leader, index) => (
-            <RankingItem key={leader.id} leader={leader} index={index} />
-          ))}
+      {/* Loading State */}
+      {isLoading ? (
+        <View className="flex-1 items-center justify-center">
+          <ActivityIndicator size="large" color="#016FEC" />
         </View>
-      </ScrollView>
+      ) : (
+        /* Leaderboard List */
+        <ScrollView className="flex-1" showsVerticalScrollIndicator={false}>
+          <View className="pb-6">
+            {displayData.length > 0 ? (
+              displayData.map((leader, index) => (
+                <RankingItem key={leader.id || index} leader={leader} index={index} />
+              ))
+            ) : (
+              <View className="items-center justify-center py-10">
+                <Text 
+                  className="text-gray-500 text-base"
+                  style={{ fontFamily: 'HankenGrotesk_600SemiBold' }}
+                >
+                  No ranking data available
+                </Text>
+              </View>
+            )}
+          </View>
+        </ScrollView>
+      )}
     </View>
   )
 }

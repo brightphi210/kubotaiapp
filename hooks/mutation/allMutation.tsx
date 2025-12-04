@@ -19,21 +19,40 @@ export const useClaimToken = (id: any) => {
 }
 
 
-// export const useUpdateUserProfile = (id: any) => {
-//   const queryClient = useQueryClient()
 
-//   const updateProfile = useMutation({
-//     mutationFn: async (data: FormData) => {
-//       const token = (await AsyncStorage.getItem("ku_token")) || ""
-//       return post_requests(`/tasks/claim-token/${id}/`, data, token)
-//     },
-//     onSuccess: () => {
-//       queryClient.invalidateQueries({ queryKey: ["profile"] })
-//     },
-//   })
 
-//   return updateProfile
-// }
+export const usePostComment = (id: any) => {
+  const queryClient = useQueryClient()
+
+  const postComment = useMutation({
+    mutationFn: async (data: FormData) => {
+      const token = (await AsyncStorage.getItem("ku_token")) || ""
+      return post_requests(`/news/comment/${id}/`, data, token)
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["comment"] })
+    },
+  })
+
+  return postComment
+}
+
+
+export const useLikePost = (id: any) => {
+  const queryClient = useQueryClient()
+
+  const likePost = useMutation({
+    mutationFn: async (data: FormData) => {
+      const token = (await AsyncStorage.getItem("ku_token")) || ""
+      return post_requests(`/news/${id}/like/`, {}, token)
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["like"] })
+    },
+  })
+
+  return likePost
+}
 
 
 
