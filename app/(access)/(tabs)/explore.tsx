@@ -5,19 +5,19 @@ import axios from 'axios'
 import { StatusBar } from 'expo-status-bar'
 import React, { JSX, useCallback, useMemo, useState } from 'react'
 import {
-    ActivityIndicator,
-    Alert,
-    Dimensions,
-    FlatList,
-    Image,
-    Linking,
-    Modal,
-    RefreshControl,
-    ScrollView,
-    Text,
-    TextInput,
-    TouchableOpacity,
-    View
+  ActivityIndicator,
+  Alert,
+  Dimensions,
+  FlatList,
+  Image,
+  Linking,
+  Modal,
+  RefreshControl,
+  ScrollView,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View
 } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 
@@ -53,34 +53,6 @@ interface TrendingCoin {
     thumb: string
     price_btc: number
     score: number
-  }
-}
-
-interface NewsArticle {
-  kind: string
-  domain: string
-  title: string
-  published_at: string
-  slug: string
-  currencies: {
-    code: string
-    title: string
-    slug: string
-    url: string
-  }[]
-  id: string
-  url: string
-  created_at: string
-  votes: {
-    negative: number
-    positive: number
-    important: number
-    liked: number
-    disliked: number
-    lol: number
-    toxic: number
-    saved: number
-    comments: number
   }
 }
 
@@ -123,7 +95,7 @@ interface CoinDetails {
   }
 }
 
-type TabType = 'tokens' | 'trending' | 'memes' | 'news' | 'watchlist'
+type TabType = 'tokens' | 'trending' | 'memes' | 'watchlist'
 
 const { width } = Dimensions.get('window')
 
@@ -162,30 +134,6 @@ const fetchMemeCoins = async (): Promise<Coin[]> => {
   return data
 }
 
-const fetchCryptoNews = async (): Promise<NewsArticle[]> => {
-  try {
-    const { data } = await api.get('/news')
-    return data.data || []
-  } catch (error) {
-    // Fallback to mock data if API fails
-    const mockNews: NewsArticle[] = [
-      {
-        kind: 'news',
-        domain: 'cryptonews.com',
-        title: 'Bitcoin Reaches New All-Time High Amid Institutional Adoption',
-        published_at: new Date().toISOString(),
-        slug: 'bitcoin-ath-institutional-adoption',
-        currencies: [{ code: 'BTC', title: 'Bitcoin', slug: 'bitcoin', url: 'https://coingecko.com/en/coins/bitcoin' }],
-        id: '1',
-        url: '#',
-        created_at: new Date().toISOString(),
-        votes: { negative: 0, positive: 15, important: 8, liked: 12, disliked: 0, lol: 0, toxic: 0, saved: 5, comments: 3 }
-      }
-    ]
-    return mockNews
-  }
-}
-
 const fetchCoinDetails = async (coinId: string): Promise<CoinDetails> => {
   const { data } = await api.get(`/coins/${coinId}`, {
     params: {
@@ -215,33 +163,16 @@ const Explore: React.FC = () => {
   const { data: coins = [], isLoading: coinsLoading, refetch: refetchCoins } = useQuery({
     queryKey: ['coins'],
     queryFn: fetchCoins,
-    // refetchInterval: 30000,
-    // refetchIntervalInBackground: true,
-    // staleTime: 25000,
   })
 
   const { data: trendingCoins = [], isLoading: trendingLoading, refetch: refetchTrending } = useQuery({
     queryKey: ['trending'],
     queryFn: fetchTrendingCoins,
-    // refetchInterval: 30000,
-    // refetchIntervalInBackground: true,
-    // staleTime: 25000,
   })
 
   const { data: memeCoins = [], isLoading: memesLoading, refetch: refetchMemes } = useQuery({
     queryKey: ['memes'],
     queryFn: fetchMemeCoins,
-    // refetchInterval: 30000,
-    // refetchIntervalInBackground: true,
-    // staleTime: 25000,
-  })
-
-  const { data: newsArticles = [], isLoading: newsLoading, refetch: refetchNews } = useQuery({
-    queryKey: ['news'],
-    queryFn: fetchCryptoNews,
-    // refetchInterval: 30000,
-    // refetchIntervalInBackground: true,
-    // staleTime: 25000,
   })
 
   const { data: selectedCoin, isLoading: coinDetailsLoading } = useQuery({
@@ -251,14 +182,13 @@ const Explore: React.FC = () => {
     staleTime: 60000,
   })
 
-  const loading = coinsLoading || trendingLoading || memesLoading || newsLoading
+  const loading = coinsLoading || trendingLoading || memesLoading
 
   const onRefresh = async (): Promise<void> => {
     await Promise.all([
       refetchCoins(),
       refetchTrending(),
-      refetchMemes(),
-      refetchNews()
+      refetchMemes()
     ])
   }
 
@@ -375,7 +305,6 @@ const Explore: React.FC = () => {
     { key: 'tokens' as TabType, title: 'All Tokens', icon: 'menu' },
     { key: 'trending' as TabType, title: 'Trending', icon: 'trending-up' },
     { key: 'memes' as TabType, title: 'Memes', icon: 'happy' },
-    { key: 'news' as TabType, title: 'News', icon: 'newspaper' },
     { key: 'watchlist' as TabType, title: 'Watchlist', icon: 'bookmark' },
   ]
 
@@ -545,66 +474,6 @@ const Explore: React.FC = () => {
       </TouchableOpacity>
     )
   }
-
-  const renderNewsItem = ({ item }: { item: NewsArticle }): JSX.Element => (
-    <TouchableOpacity 
-      className="mx-4 mb-4 bg-white rounded-3xl overflow-hidden"
-      onPress={() => openLink(item.url)}
-      activeOpacity={0.8}
-    >
-      <View className="p-5">
-        <View className="flex-row mb-4">
-          <View className="flex-1">
-            <Text style={{fontFamily: 'HankenGrotesk_500Medium'}} className="text-gray-900 font-bold text-base leading-6 mb-3" numberOfLines={3}>
-              {item.title}
-            </Text>
-            <View className="flex-row items-center justify-between mb-2">
-              <View className="bg-blue-50 rounded-lg px-3 py-1">
-                <Text style={{fontFamily: 'HankenGrotesk_500Medium'}} className="text-blue-600 font-semibold text-sm">
-                  {item.domain}
-                </Text>
-              </View>
-              <Text style={{fontFamily: 'HankenGrotesk_500Medium'}} className="text-gray-400 text-sm font-medium">
-                {new Date(item.published_at).toLocaleDateString()}
-              </Text>
-            </View>
-            {item.currencies && item.currencies.length > 0 && (
-              <View className="flex-row items-center flex-wrap">
-                <Text style={{fontFamily: 'HankenGrotesk_500Medium'}} className="text-gray-500 text-xs mr-2">Related:</Text>
-                {item.currencies.slice(0, 3).map((currency, index) => (
-                  <View key={currency.code} className="bg-gray-100 rounded px-2 py-1 mr-1 mb-1">
-                    <Text style={{fontFamily: 'HankenGrotesk_500Medium'}} className="text-gray-600 text-xs font-medium">
-                      {currency.code}
-                    </Text>
-                  </View>
-                ))}
-              </View>
-            )}
-            <View className="flex-row items-center mt-2">
-              <View className="flex-row items-center mr-4">
-                <Ionicons name="thumbs-up" size={12} color="#10b981" />
-                <Text style={{fontFamily: 'HankenGrotesk_500Medium'}} className="text-green-500 text-xs ml-1">
-                  {item.votes.positive}
-                </Text>
-              </View>
-              <View className="flex-row items-center mr-4">
-                <Ionicons name="chatbubble" size={12} color="#6b7280" />
-                <Text style={{fontFamily: 'HankenGrotesk_500Medium'}} className="text-gray-500 text-xs ml-1">
-                  {item.votes.comments}
-                </Text>
-              </View>
-              <View className="flex-row items-center">
-                <Ionicons name="bookmark" size={12} color="#f59e0b" />
-                <Text style={{fontFamily: 'HankenGrotesk_500Medium'}} className="text-amber-500 text-xs ml-1">
-                  {item.votes.saved}
-                </Text>
-              </View>
-            </View>
-          </View>
-        </View>
-      </View>
-    </TouchableOpacity>
-  )
 
   const renderCustomModal = (): JSX.Element => {
     if (!modalVisible) return <></>
@@ -1038,31 +907,6 @@ const Explore: React.FC = () => {
           />
         )
       
-      case 'news':
-        return (
-          <FlatList
-            data={newsArticles}
-            keyExtractor={(item) => item.id}
-            renderItem={renderNewsItem}
-            refreshControl={
-              <RefreshControl refreshing={false} onRefresh={onRefresh} />
-            }
-            showsVerticalScrollIndicator={false}
-            contentContainerStyle={{ paddingTop: 8, paddingBottom: 120 }}
-            ListEmptyComponent={
-              <View className="flex-1 justify-center items-center py-20">
-                <View className="bg-gray-100 rounded-full p-6 mb-4">
-                  <Ionicons name="newspaper" size={48} color="#9ca3af" />
-                </View>
-                <Text style={{fontFamily: 'HankenGrotesk_500Medium'}} className="text-gray-600 text-xl font-bold mb-2">No news available</Text>
-                <Text style={{fontFamily: 'HankenGrotesk_500Medium'}} className="text-gray-400 text-base text-center px-8 leading-6">
-                  Pull to refresh for the latest crypto news
-                </Text>
-              </View>
-            }
-          />
-        )
-      
       case 'watchlist':
         return (
           <FlatList
@@ -1189,9 +1033,7 @@ const Explore: React.FC = () => {
         </ScrollView>
       </View>
 
-      {/* Tab Content */}
       {renderTabContent()}
-
       {renderCustomModal()}
     </SafeAreaView>
   )

@@ -127,12 +127,12 @@ const Profile = () => {
           </TouchableOpacity>
 
           {/* Earning Team */}
-          <TouchableOpacity onPress={()=>router.push('/(access)/(stacks)/task')} className="flex-row items-center justify-between py-4 px-4 bg-gray-50 rounded-xl mb-2">
+          <TouchableOpacity onPress={()=>router.push('/(access)/(stacks)/wallet')} className="flex-row items-center justify-between py-4 px-4 bg-gray-50 rounded-xl mb-2">
             <View className="flex-row items-center">
               <View className="w-10 h-10 bg-gray-200 rounded-lg items-center justify-center mr-3">
-                <MaterialIcons name='task' size={20} color={'gray'}/>
+                <MaterialIcons name='wallet' size={20} color={'gray'}/>
               </View>
-              <Text className="text-gray-800 font-medium text-base">Available Task</Text>
+              <Text className="text-gray-800 font-medium text-base">Connect Wallet</Text>
             </View>
             <Text className="text-gray-400 text-lg">›</Text>
           </TouchableOpacity>

@@ -12,6 +12,7 @@ import { Animated, Easing, Image, Modal, Pressable, RefreshControl, ScrollView, 
 interface Task {
   id: string | number
   images: string
+  image: string
   title: string
   description: string
   category: string
@@ -22,6 +23,7 @@ interface Task {
 
 interface CompletedTask {
   id: string | number
+  images: string
   image: string
   date: string
   time: string
@@ -374,7 +376,7 @@ const Tasks = () => {
                     <View className='flex-row items-start mb-3'>
                       <View style={{ position: 'relative' }}>
                         <Image 
-                          source={{ uri: task.image }}
+                          source={{ uri: task?.image }}
                           style={{ 
                             width: 60, 
                             height: 60, 

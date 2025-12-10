@@ -10,13 +10,17 @@
     "newArchEnabled": true,
     "ios": {
       "supportsTablet": true,
-      "backgroundModes": ["background-fetch"]
+      "backgroundModes": [
+        "background-fetch"
+      ]
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#ffffff",
-        "permissions": ["RECEIVE_BOOT_COMPLETED"]
+        "permissions": [
+          "RECEIVE_BOOT_COMPLETED"
+        ]
       },
       "edgeToEdgeEnabled": true,
       "package": "com.bright210.kubotai"
@@ -42,7 +46,8 @@
         {
           "photosPermission": "The app accesses your photos to let you share them with your friends."
         }
-      ]
+      ],
+      "expo-web-browser",
     ],
     "experiments": {
       "typedRoutes": true

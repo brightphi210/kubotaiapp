@@ -4,7 +4,6 @@ import { Text, View } from 'react-native';
 
 import { HapticTab } from '@/components/HapticTab';
 import { useColorScheme } from '@/hooks/useColorScheme';
-import Ionicons from '@expo/vector-icons/Ionicons';
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 
 export default function TabLayout() {
@@ -90,17 +89,17 @@ export default function TabLayout() {
       />
 
       <Tabs.Screen
-        name="wallet"
+        name="task"
         options={{
-          title: 'Wallet',
+          title: 'Task',
            tabBarIcon: ({ focused }) => (
             <View style={{
               backgroundColor: 'transparent',
               justifyContent: 'center',
               alignItems: 'center',
             }}>
-              <Ionicons name='wallet-outline' size={22} color={ focused ? "#016FEC": "#5F5F5F"} />
-              <Text className={`text-xs ${focused ? "text-[#016FEC]": "text-[#5F5F5F]"}` } style={{fontFamily: 'HankenGrotesk_600SemiBold'}}>Wallet</Text>
+              <MaterialIcons name='task-alt' size={22} color={ focused ? "#016FEC": "#5F5F5F"} />
+              <Text className={`text-xs ${focused ? "text-[#016FEC]": "text-[#5F5F5F]"}` } style={{fontFamily: 'HankenGrotesk_600SemiBold'}}>Task</Text>
             </View>
           ),
         }}

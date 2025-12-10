@@ -1,19 +1,19 @@
 import Header from '@/components/Header'
 import LoadingOverlay from '@/components/LoadingOverlay'
-import { useGetFriends } from '@/hooks/queries/allQueries'
+import { useGetFriends, useGetInvitation } from '@/hooks/queries/allQueries'
 import { Ionicons } from '@expo/vector-icons'
 import MaterialIcons from '@expo/vector-icons/MaterialIcons'
+import * as Clipboard from 'expo-clipboard'
 import { StatusBar } from 'expo-status-bar'
 import React, { useState } from 'react'
+
 import {
-  Alert,
-  Image,
   ScrollView,
-  Share,
   Text,
   TouchableOpacity,
   View
 } from 'react-native'
+import { Toast } from 'react-native-toast-notifications'
 
 
 const Friends = () => {
@@ -27,37 +27,29 @@ const Friends = () => {
   
   const totalInvited = myFriendsData.length // pioneers
 
-  const handleCopyInviteLink = async () => {
-    const inviteLink = 'https://kubot.app/invite/iamkvisuals'
-    
-    try {
-      await Share.share({
-        message: `Join me on Kubot and start mining tokens! Use my invite link: ${inviteLink}`,
-        url: inviteLink,
-      })
-    } catch (error) {
-      Alert.alert('Error', 'Could not copy invite link')
+
+  const { getInvitationToken, isLoading: getInvitationLoading } = useGetInvitation()
+  const inviteCode = getInvitationToken?.data.data?.referral_code
+  console.log('This is invitation code', inviteCode)
+
+  const handleCopyCode = async () => {
+    if (inviteCode) {
+      await Clipboard.setStringAsync(inviteCode);
+      Toast.show('Referral code copied to clipboard!', { type: 'success' });
     }
-  }
+  };
 
 
   const TeamMemberItem = ({ member }: any) => (
     <View className="flex-row items-center justify-between py-4 px-4 mb-3 bg-white rounded-xl">
       <View className="flex-row items-center flex-1">
-        <View className="w-12 h-12 bg-gray-200 rounded-full object-cover overflow-hidden mr-4 justify-center items-center">
-          {member?.referred_user?.profile?.image ? (
-            <Image 
-              source={{uri: member.referred_user.profile.image}} 
-              className='w-full h-full object-cover'
-            />
-          ) : (
-            <Ionicons name="person" size={24} color="gray" />
-          )}
+        <View className="w-10 h-10 bg-gray-200 rounded-full object-cover overflow-hidden mr-4 justify-center items-center">
+          <Ionicons name="person" size={20} color="gray" />
         </View>
         
         <View className="flex-1">
           <Text className="text-[#016FEC] text-base mb-1" style={{fontFamily: 'HankenGrotesk_600SemiBold'}}>
-            {member?.referred_user?.fullName|| 'Chibuzor Philip'}
+            {member?.referred_user?.username|| 'Chibuzor Philip'}
           </Text>
           <Text className="text-neutral-400 text-xs" style={{fontFamily: 'HankenGrotesk_400Regular'}}>
             {member?.referred_user?.username.slice(0, 20) || 'N/A'}...
@@ -165,13 +157,13 @@ const Friends = () => {
         {/* Copy Invite Link Button - Always visible */}
         <View className="px-6 pb-8 pt-4 bg-gray-100">
           <TouchableOpacity
-            onPress={handleCopyInviteLink}
+            onPress={handleCopyCode}
             className="bg-[#016FEC] rounded-xl py-4 px-6 shadow-lg"
           >
             <View className="flex-row items-center justify-center">
               <MaterialIcons name='link' size={24} color={'white'} />
               <Text className="text-white text-sm font-medium ml-3" style={{fontFamily: 'HankenGrotesk_500Medium'}}>
-                Copy Invite Link
+                Copy Code
               </Text>
             </View>
           </TouchableOpacity>

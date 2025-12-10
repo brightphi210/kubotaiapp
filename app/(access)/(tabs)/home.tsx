@@ -482,8 +482,8 @@ const Home = () => {
             <TouchableOpacity className="p-2.5 bg-black/10 rounded-full" onPress={()=>router.push('/(access)/(stacks)/leaders')}>
               <MaterialIcons name='emoji-events' size={22} color={'white'}/>
             </TouchableOpacity>
-            <TouchableOpacity onPress={()=>router.push('/(access)/(stacks)/task')} className="p-2.5 bg-black/10 rounded-full">
-              <MaterialIcons name='task' size={22} color={'white'}/>
+            <TouchableOpacity onPress={()=>router.push('/(access)/(stacks)/wallet')} className="p-2.5 bg-black/10 rounded-full">
+              <MaterialIcons name='wallet' size={22} color={'white'}/>
             </TouchableOpacity>
             <TouchableOpacity onPress={()=>router.push('/(access)/(stacks)/earnings')} className="p-2.5 bg-black/10 rounded-full ">
               <MaterialIcons name='trending-up' size={22} color={'white'}/>
